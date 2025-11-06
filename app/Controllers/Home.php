@@ -6,8 +6,8 @@ class Home extends BaseController
 {
     public function index()
     {
-        // Data Dummy Lowongan
-        $dummyLowongan = [
+        // Data Dummy Lengkap
+        $allLowongan = [
             [
                 'posisi' => 'Web Developer (Intern)',
                 'unit' => 'Seksi Operasi & Pemeliharaan',
@@ -26,14 +26,19 @@ class Home extends BaseController
                 'posisi' => 'Staf Administrasi',
                 'unit' => 'Bagian Tata Usaha',
                 'kebutuhan' => 3,
-                'status' => 'Penuh',
+                'status' => 'Penuh', // Ini nanti otomatis TIDAK akan tampil
                 'deskripsi' => 'Mengelola arsip surat masuk dan keluar serta dokumen lainnya.'
             ]
         ];
 
+        // FILTER OTOMATIS: Hanya ambil yang statusnya 'Dibuka'
+        $lowonganDibuka = array_filter($allLowongan, function($job) {
+            return $job['status'] === 'Dibuka';
+        });
+
         $data = [
             'title' => 'Beranda - Portal Magang BWS V',
-            'lowongan' => $dummyLowongan // Mengirim data ke View
+            'lowongan' => $lowonganDibuka // Kirim data yang sudah difilter
         ];
 
         return view('home', $data);
