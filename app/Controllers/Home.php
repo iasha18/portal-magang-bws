@@ -6,7 +6,7 @@ class Home extends BaseController
 {
     public function index()
     {
-        // Kumpulan data lowongan pura-pura (dummy)
+        // Data Dummy Lowongan
         $dummyLowongan = [
             [
                 'posisi' => 'Web Developer (Intern)',
@@ -23,18 +23,19 @@ class Home extends BaseController
                 'deskripsi' => 'Melakukan rekapitulasi dan analisis data curah hujan dan debit air.'
             ],
             [
-                'posisi' => 'Staf Administrasi & Kearsipan',
+                'posisi' => 'Staf Administrasi',
                 'unit' => 'Bagian Tata Usaha',
                 'kebutuhan' => 3,
                 'status' => 'Penuh',
-                'deskripsi' => 'Mengelola arsip surat masuk dan surat keluar serta dokumen lainnya.'
+                'deskripsi' => 'Mengelola arsip surat masuk dan keluar serta dokumen lainnya.'
             ]
         ];
 
         $data = [
             'title' => 'Beranda - Portal Magang BWS V',
-            'lowongan' => $dummyLowongan // Kirim data lowongan ke view
+            'lowongan' => $dummyLowongan // Mengirim data ke View
         ];
+
         return view('home', $data);
     }
 }
