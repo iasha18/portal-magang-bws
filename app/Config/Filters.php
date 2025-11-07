@@ -34,6 +34,8 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+        // Menambahkan alias untuk filter Auth buatan kita sendiri
+        'auth'          => \App\Filters\AuthFilter::class, 
     ];
 
     /**
@@ -66,8 +68,8 @@ class Filters extends BaseFilters
      * applied before and after every request.
      *
      * @var array{
-     *     before: array<string, array{except: list<string>|string}>|list<string>,
-     *     after: array<string, array{except: list<string>|string}>|list<string>
+     * before: array<string, array{except: list<string>|string}>|list<string>,
+     * after: array<string, array{except: list<string>|string}>|list<string>
      * }
      */
     public array $globals = [

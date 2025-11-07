@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><?= $title ?? 'Admin BWS SUMATERA V'; ?></title>
+    
+    <!-- Kita pakai Bootstrap & Font Awesome yang sama dari CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; }
+        .sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0;
+            width: 260px; background-color: #212529; /* Warna gelap */
+            padding-top: 20px; z-index: 100;
+        }
+        .sidebar-brand {
+            font-size: 1.5rem; font-weight: 700; color: #fff;
+            text-align: center; display: block; margin-bottom: 20px;
+        }
+        .sidebar-nav .nav-link {
+            color: #adb5bd; padding: 10px 20px;
+            display: flex; align-items: center;
+            transition: 0.3s;
+        }
+        .sidebar-nav .nav-link i { margin-right: 15px; width: 20px; text-align: center; }
+        .sidebar-nav .nav-link:hover, .sidebar-nav .nav-link.active {
+            color: #fff; background-color: #343a40;
+            border-radius: 8px;
+        }
+        .main-content {
+            margin-left: 260px; /* Seukuran sidebar */
+            padding: 20px;
+        }
+        .navbar-admin {
+            background: #fff; border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 15px 20px; margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Menu Samping -->
+    <div class="sidebar shadow">
+        <a href="<?= base_url('admin') ?>" class="sidebar-brand">ADMIN BWS SUMATERA V</a>
+        <ul class="nav flex-column sidebar-nav px-3">
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="<?= base_url('admin/lowongan') ?>">
+                    <i class="fas fa-briefcase"></i> Kelola Lowongan
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-users"></i> Data Pendaftar
+                </a>
+            </li>
+            <hr class="text-secondary">
+            <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('/') ?>" target="_blank">
+                    <i class="fas fa-home"></i> Lihat Website
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Konten Utama (Kanan) -->
+    <div class="main-content">
+        <!-- Header Konten -->
+        <nav class="navbar-admin d-flex justify-content-between">
+            <h4 class="h5 mb-0 fw-bold"><?= $title; ?></h4>
+            <span class="text-muted">Selamat Datang, Admin!</span>
+        </nav>
+
+        <!-- Ini adalah tempat konten dinamis akan diisi -->
+        <div class="content-wrapper">
+            <?= $this->renderSection('content'); ?>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

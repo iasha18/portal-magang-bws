@@ -2,43 +2,24 @@
 
 namespace App\Controllers;
 
+// Panggil Model yang baru kita buat agar dikenali di sini
+use App\Models\LowonganModel;
+
 class Home extends BaseController
 {
     public function index()
     {
-        // Data Dummy Lengkap
-        $allLowongan = [
-            [
-                'posisi' => 'Web Developer (Intern)',
-                'unit' => 'Seksi Operasi & Pemeliharaan',
-                'kebutuhan' => 2,
-                'status' => 'Dibuka',
-                'deskripsi' => 'Membantu pengembangan dan pemeliharaan sistem informasi internal BWS V.'
-            ],
-            [
-                'posisi' => 'Analis Data Hidrologi',
-                'unit' => 'Seksi Perencanaan',
-                'kebutuhan' => 1,
-                'status' => 'Dibuka',
-                'deskripsi' => 'Melakukan rekapitulasi dan analisis data curah hujan dan debit air.'
-            ],
-            [
-                'posisi' => 'Staf Administrasi',
-                'unit' => 'Bagian Tata Usaha',
-                'kebutuhan' => 3,
-                'status' => 'Penuh', // Ini nanti otomatis TIDAK akan tampil
-                'deskripsi' => 'Mengelola arsip surat masuk dan keluar serta dokumen lainnya.'
-            ]
-        ];
+        // 1. Aktifkan Model (Si Kurir)
+        $modelLowongan = new LowonganModel();
 
-        // FILTER OTOMATIS: Hanya ambil yang statusnya 'Dibuka'
-        $lowonganDibuka = array_filter($allLowongan, function($job) {
-            return $job['status'] === 'Dibuka';
-        });
+        // 2. Minta Kurir mengambil data yang statusnya 'Dibuka' saja
+        // findAll() artinya ambil semua hasil yang cocok
+        $dataLowongan = $modelLowongan->where('status', 'Dibuka')->findAll();
 
+        // 3. Kirim data asli dari database ke View
         $data = [
-            'title' => 'Beranda - Portal Magang BWS V',
-            'lowongan' => $lowonganDibuka // Kirim data yang sudah difilter
+            'title'    => 'Beranda - Portal Magang BWS V',
+            'lowongan' => $dataLowongan
         ];
 
         return view('home', $data);
