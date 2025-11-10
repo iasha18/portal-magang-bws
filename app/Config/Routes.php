@@ -1,61 +1,47 @@
 <?php
 
-namespace Config;
-
-// Tambahkan baris ini agar kita bisa pakai Model di dalam file Routes
 use CodeIgniter\Router\RouteCollection;
-use App\Models\UserModel; 
+use App\Models\UserModel; // Dibutuhkan jika Anda masih punya rute reset
 
 /**
  * @var RouteCollection $routes
  */
 
-// ==================================================
-// 1. RUTE PUBLIK (Bisa diakses siapa saja)
-// ==================================================
+// 1. RUTE PUBLIK
 $routes->get('/', 'Home::index');
 
+// 2. RUTE OTENTIKASI
+$routes->get('login', 'Auth::login');
+$routes->post('login/proses', 'Auth::loginProses');
+$routes->get('logout', 'Auth::logout');
+$routes->get('register', 'Auth::register');
+$routes->post('register/proses', 'Auth::registerProses');
 
-// ==================================================
-// 2. RUTE OTENTIKASI (Login, Register, Logout)
-// ==================================================
-$routes->get('login', 'Auth::login');              // Menampilkan halaman login
-$routes->post('login/proses', 'Auth::loginProses'); // Memproses form login
-$routes->get('logout', 'Auth::logout');            // Proses logout
-$routes->get('register', 'Auth::register');        // Menampilkan halaman daftar
-// $routes->post('register/proses', 'Auth::registerProses'); // (Akan datang)
-
-
-// ==================================================
-// 3. RUTE ADMIN (Dijaga oleh filter 'auth')
-// ==================================================
-// Semua URL yang dimulai dengan 'admin' Wajib Login dulu
-$routes->group('admin', ['filter' => 'auth'], function($routes) {
-    $routes->get('/', 'Admin::index');
-    $routes->get('lowongan', 'Admin::lowongan');
+// 3. RUTE PESERTA
+$routes->group('peserta', ['filter' => 'auth'], function($routes) {
+    $routes->get('/', 'Peserta::index');
+    $routes->get('apply/(:num)', 'Peserta::apply/$1');
+    // RUTE BARU: PROFIL & BIODATA
+    $routes->get('profil', 'Peserta::profil'); // Menampilkan form edit profil
+    $routes->post('profil/update', 'Peserta::updateProfil'); // Proses simpan/update profil
 });
 
+// 4. RUTE ADMIN
+$routes->group('admin', ['filter' => 'auth'], function($routes) {
+    $routes->get('/', 'Admin::index');
+    
+    // Lowongan
+    $routes->get('lowongan', 'Admin::lowongan');
+    $routes->get('lowongan/tambah', 'Admin::tambah');
+    $routes->post('lowongan/simpan', 'Admin::simpan');
+    $routes->get('lowongan/edit/(:num)', 'Admin::edit/$1');
+    $routes->post('lowongan/update', 'Admin::update');
+    $routes->get('lowongan/hapus/(:num)', 'Admin::hapus/$1');
 
-// ==================================================
-// 4. RUTE DARURAT (HANYA UNTUK RESET PASSWORD!)
-// ==================================================
-// PERINGATAN: Segera hapus bagian ini setelah berhasil login!
-$routes->get('reset-admin', function() {
-    $userModel = new UserModel();
+    // Pendaftar
+    $routes->get('pendaftar', 'Admin::pendaftar');
+    $routes->get('pendaftar/update/(:num)/(:segment)', 'Admin::updateStatus/$1/$2');
     
-    // Kita paksa password 'admin123' dienkripsi ulang oleh sistem server Anda saat ini
-    // agar 100% cocok.
-    $passwordBaru = password_hash('admin123', PASSWORD_DEFAULT);
-    
-    // Update database
-    $userModel->where('email', 'admin@bws.com')
-              ->set(['password' => $passwordBaru])
-              ->update();
-              
-    echo "<h1 style='color:green;'>SUKSES!</h1>";
-    echo "<p>Password untuk <b>admin@bws.com</b> telah direset menjadi: <b>admin123</b></p>";
-    echo "<a href='" . base_url('login') . "'>Klik di sini untuk Login Admin</a>";
-    echo "<br><br><hr>";
-    echo "<h3 style='color:red;'>PENTING:</h3>";
-    echo "<p style='color:red;'>Segera hapus kembali rute 'reset-admin' ini dari file Routes.php Anda agar website aman.</p>";
+    // [INI RUTE PENTINGNYA] Pastikan baris ini ada
+    $routes->get('pendaftar/detail/(:num)', 'Admin::detailPendaftar/$1');
 });

@@ -25,14 +25,33 @@
             <p class="text-muted lead">Tahapan mudah untuk bergabung menjadi bagian dari kami</p>
         </div>
 
-        <div class="row text-center mb-5 d-none d-lg-flex step-container">
-            <div class="step-line"></div>
-            <div class="col"><div class="step-icon">1</div></div>
-            <div class="col"><div class="step-icon">2</div></div>
-            <div class="col"><div class="step-icon">3</div></div>
-            <div class="col"><div class="step-icon">4</div></div>
-            <div class="col"><div class="step-icon">5</div></div>
+<div class="step-container position-relative mb-5 d-none d-lg-block text-center">
+    <div class="step-line"></div>
+
+    <div class="row row-cols-5 justify-content-center">
+        <div class="col">
+            <div class="step-icon">1</div>
+            <p class="fw-semibold mt-3">Pendaftaran Akun</p>
         </div>
+        <div class="col">
+            <div class="step-icon">2</div>
+            <p class="fw-semibold mt-3">Kirim Permohonan</p>
+        </div>
+        <div class="col">
+            <div class="step-icon">3</div>
+            <p class="fw-semibold mt-3">Proses Seleksi</p>
+        </div>
+        <div class="col">
+            <div class="step-icon">4</div>
+            <p class="fw-semibold mt-3">Lengkapi Data</p>
+        </div>
+        <div class="col">
+            <div class="step-icon">5</div>
+            <p class="fw-semibold mt-3">Mulai Magang</p>
+        </div>
+    </div>
+</div>
+
 
         <div class="row g-4 justify-content-center">
             <div class="col-md-6 col-lg-4 col-xl">
@@ -128,7 +147,13 @@
                                 <div class="text-muted small fw-bold">
                                     <i class="fas fa-users me-2 text-primary opacity-50"></i>Kuota: <?= $job['kebutuhan']; ?>
                                 </div>
-                                <a href="#" class="btn btn-primary rounded-pill px-4 fw-bold">Apply Now</a>
+                                
+                                <a href="<?= base_url('peserta/apply/' . $job['id']) ?>" 
+                                   class="btn btn-primary rounded-pill px-4 fw-bold"
+                                   onclick="return confirm('Anda yakin ingin melamar di posisi <?= esc($job['posisi']) ?> ini?')">
+                                    Apply Now
+                                </a>
+
                             </div>
                         </div>
                     </div>
