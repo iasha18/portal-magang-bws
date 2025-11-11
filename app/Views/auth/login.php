@@ -69,6 +69,11 @@
 
             <div class="card-body p-4 p-md-5">
 
+                <?php if(session()->getFlashdata('pesan_sukses')): ?>
+                    <div class="alert alert-success border-0 shadow-sm mb-4 fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i> <?= session()->getFlashdata('pesan_sukses') ?>
+                    </div>
+                <?php endif; ?>
                 <?php if(session()->getFlashdata('pesan_error')): ?>
                     <div class="alert alert-danger border-0 shadow-sm mb-4 fade show" role="alert">
                         <i class="fas fa-exclamation-circle me-2"></i> <?= session()->getFlashdata('pesan_error') ?>
@@ -94,18 +99,21 @@
                         <form action="<?= base_url('login/proses') ?>" method="post">
                             <?= csrf_field() ?>
                             <div class="mb-3">
-                                <label for="email" class="form-label small text-muted fw-bold ms-1">Email Peserta</label>
+                                <label for="email-peserta" class="form-label small text-muted fw-bold ms-1">Email Peserta</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0 text-muted ps-3"><i class="fas fa-envelope"></i></span>
-                                    <input type="email" class="form-control border-start-0 ps-2" id="email" name="email" placeholder="contoh@email.com" required>
+                                    <input type="email" class="form-control border-start-0 ps-2" id="email-peserta" name="email" placeholder="contoh@email.com" required>
                                 </div>
                             </div>
-                            <div class="mb-4">
-                                <label for="password" class="form-label small text-muted fw-bold ms-1">Kata Sandi</label>
+                            <div class="mb-3">
+                                <label for="password-peserta" class="form-label small text-muted fw-bold ms-1">Kata Sandi</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0 text-muted ps-3"><i class="fas fa-lock"></i></span>
-                                    <input type="password" class="form-control border-start-0 ps-2" id="password" name="password" placeholder="••••••••" required>
+                                    <input type="password" class="form-control border-start-0 ps-2" id="password-peserta" name="password" placeholder="••••••••" required>
                                 </div>
+                            </div>
+                            <div class="text-end mb-4">
+                                <a href="<?= base_url('lupa-password') ?>" class="text-decoration-none small text-primary fw-medium">Lupa sandi?</a>
                             </div>
                             <button type="submit" class="btn btn-primary w-100 btn-login shadow-sm">
                                 MASUK SEKARANG
@@ -130,12 +138,15 @@
                                     <input type="email" class="form-control border-start-0 ps-2" name="email" placeholder="admin@bws.go.id" required>
                                 </div>
                             </div>
-                            <div class="mb-4">
+                            <div class="mb-3">
                                 <label class="form-label small text-muted fw-bold ms-1">Kata Sandi Admin</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0 text-muted ps-3"><i class="fas fa-key"></i></span>
                                     <input type="password" class="form-control border-start-0 ps-2" name="password" placeholder="••••••••" required>
                                 </div>
+                            </div>
+                            <div class="text-end mb-4">
+                                <a href="<?= base_url('lupa-password') ?>" class="text-decoration-none small text-primary fw-medium">Lupa sandi?</a>
                             </div>
                             <button type="submit" class="btn btn-danger w-100 btn-login shadow-sm">
                                 LOGIN ADMIN

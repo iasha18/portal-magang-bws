@@ -17,25 +17,29 @@
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-striped table-hover align-middle">
-                <thead class="table-dark">
+                <thead class="table-light">
                     <tr>
-                        <th>#</th>
-                        <th>Nama Pendaftar</th>
-                        <th>Email</th>
-                        <th>Posisi Dilamar</th>
-                        <th>Tgl. Daftar</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
+                        <th scope="col">#</th>
+                        <th scope="col">Nama Pendaftar</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Posisi Dilamar</th>
+                        <th scope="col">Tgl. Daftar</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($pendaftar)): ?>
-                        <tr><td colspan="7" class="text-center text-muted py-4">Belum ada data pendaftar.</td></tr>
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="fas fa-info-circle me-2"></i> Belum ada data pendaftar.
+                            </td>
+                        </tr>
                     <?php else: ?>
                         <?php $i = 1; ?>
                         <?php foreach ($pendaftar as $lamaran) : ?>
                             <tr>
-                                <th><?= $i++; ?></th>
+                                <th scope="row"><?= $i++; ?></th>
                                 <td><?= esc($lamaran['nama']); ?></td>
                                 <td><?= esc($lamaran['email']); ?></td>
                                 <td class="fw-bold"><?= esc($lamaran['posisi']); ?></td>
@@ -43,7 +47,7 @@
                                 <td>
                                     <?php 
                                         $status = $lamaran['status_lamaran'];
-                                        $badge_color = 'bg-warning text-dark'; // Pending
+                                        $badge_color = 'bg-warning text-dark';
                                         if ($status == 'Diterima') $badge_color = 'bg-success';
                                         if ($status == 'Ditolak') $badge_color = 'bg-danger';
                                     ?>
@@ -63,6 +67,11 @@
                                     <a href="<?= base_url('admin/pendaftar/detail/' . $lamaran['id_lamaran']) ?>" 
                                        class="btn btn-info btn-sm text-white" title="Lihat Detail">
                                         <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="<?= base_url('admin/pendaftar/hapus/' . $lamaran['id_lamaran']) ?>" 
+                                       class="btn btn-outline-danger btn-sm" title="Hapus Lamaran Permanen"
+                                       onclick="return confirm('PERINGATAN! Anda akan menghapus data lamaran ini secara permanen. Ini tidak bisa dibatalkan. Lanjutkan?')">
+                                        <i class="fas fa-trash-alt"></i>
                                     </a>
                                 </td>
                             </tr>

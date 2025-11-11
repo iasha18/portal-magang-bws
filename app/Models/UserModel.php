@@ -11,9 +11,16 @@ class UserModel extends Model
     protected $useAutoIncrement = true;
     
     // Kolom-kolom yang boleh diisi atau diubah oleh aplikasi
-    protected $allowedFields    = ['nama', 'email', 'password', 'role', 'created_at'];
+    protected $allowedFields    = [
+        'nama', 
+        'email', 
+        'password', 
+        'role', 
+        'created_at',
+        'reset_token', // <-- TAMBAHAN UNTUK FITUR LUPA PASSWORD
+        'reset_token_expires' // <-- TAMBAHAN UNTUK FITUR LUPA PASSWORD
+    ];
 
     // Fitur tambahan: Otomatis mencatat waktu saat data dibuat/diubah
-    // (Opsional tapi bagus untuk ke depannya)
     protected $useTimestamps = false; 
 }

@@ -6,12 +6,12 @@
     <div class="hero-overlay d-flex align-items-center">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-lg-8">
+                <div class="col-lg-9">
                     <span class="badge bg-white text-primary bg-opacity-10 px-3 py-2 rounded-pill mb-4 fw-medium" style="background-color: rgba(255,255,255,0.9) !important; color: #0d6efd !important;">
-                        <i class="fas fa-briefcase me-2"></i> Portal Resmi Magang
+                        <i class="fas fa-briefcase me-2"></i> Official Internship Portal
                     </span>
-                    <h1 class="display-4 fw-bold text-white mb-4" style="line-height: 1.2;">Awali Karir Profesional Anda Bersama Kami</h1>
-                    <p class="lead text-white-50 mb-0 px-lg-5">Dapatkan pengalaman nyata membangun infrastruktur negeri di lingkungan kerja yang profesional dan kolaboratif di BWS SUMATERA V.</p>
+                    <h1 class="display-4 fw-bold text-white mb-4" style="line-height: 1.2;">Your First Step Toward a Brighter Career</h1>
+                    <p class="lead text-white-50 mb-0 px-lg-5">Mulai karir profesional Anda dengan pengalaman nyata membangun infrastruktur air sesungguhnya bersama kami di BWS Sumatera V.</p>
                 </div>
             </div>
         </div>
@@ -43,28 +43,24 @@
         </div>
         <div class="col">
             <div class="step-icon">4</div>
-            <p class="fw-semibold mt-3">Lengkapi Data</p>
+            <p class="fw-semibold mt-3">Mulai magang</p>
         </div>
-        <div class="col">
-            <div class="step-icon">5</div>
-            <p class="fw-semibold mt-3">Mulai Magang</p>
-        </div>
+
     </div>
 </div>
 
-
         <div class="row g-4 justify-content-center">
-            <div class="col-md-6 col-lg-4 col-xl">
+            <div class="col-md-6 col-lg-3">
                 <div class="card card-alu h-100 p-4 text-center">
                     <div class="card-body">
-                        <i class="fas fa-user-plus fa-3x text-primary mb-4"></i>
-                        <h5 class="fw-bold mb-3">Buat Akun</h5>
-                        <p class="text-muted small">Daftarkan diri Anda untuk mendapatkan akses ke portal magang.</p>
+                        <i class="fas fa-user-check fa-3x text-primary mb-4"></i>
+                        <h5 class="fw-bold mb-3">Buat Akun & Lengkapi Data</h5>
+                        <p class="text-muted small">Daftarkan diri Anda dan lengkapi biodata serta dokumen awal Anda.</p>
                         <a href="<?= base_url('register') ?>" class="btn btn-primary w-100 mt-3 rounded-pill fw-bold">DAFTAR SEKARANG</a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4 col-xl">
+            <div class="col-md-6 col-lg-3">
                 <div class="card card-alu h-100 p-4 text-center">
                     <div class="card-body">
                         <i class="fas fa-file-upload fa-3x text-success mb-4"></i>
@@ -73,7 +69,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4 col-xl">
+            <div class="col-md-6 col-lg-3">
                 <div class="card card-alu h-100 p-4 text-center">
                     <div class="card-body">
                         <i class="fas fa-clipboard-check fa-3x text-warning mb-4"></i>
@@ -82,17 +78,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4 col-xl">
-                <div class="card card-alu h-100 p-4 text-center">
-                    <div class="card-body">
-                        <i class="fas fa-user-edit fa-3x text-info mb-4"></i>
-                        <h5 class="fw-bold mb-3">Lengkapi Data</h5>
-                        <p class="text-muted small">Jika diterima, lengkapi biodata diri dan dokumen pendukung lainnya.</p>
-                    </div>
-                </div>
-            </div>
-             <div class="col-md-6 col-lg-4 col-xl">
-                <div class="card card-alu h-100 p-4 text-center">
+            <div class="col-md-6 col-lg-3">
+                <div class="card card-alu h-100 p-4 text-center"> 
                     <div class="card-body">
                         <i class="fas fa-building fa-3x text-danger mb-4"></i>
                         <h5 class="fw-bold mb-3">Mulai Magang</h5>
@@ -120,7 +107,6 @@
                 </select>
             </div>
         </div>
-
         <div class="row g-4">
             <?php if (empty($lowongan)): ?>
                 <div class="col-12">
@@ -147,13 +133,11 @@
                                 <div class="text-muted small fw-bold">
                                     <i class="fas fa-users me-2 text-primary opacity-50"></i>Kuota: <?= $job['kebutuhan']; ?>
                                 </div>
-                                
                                 <a href="<?= base_url('peserta/apply/' . $job['id']) ?>" 
                                    class="btn btn-primary rounded-pill px-4 fw-bold"
                                    onclick="return confirm('Anda yakin ingin melamar di posisi <?= esc($job['posisi']) ?> ini?')">
                                     Apply Now
                                 </a>
-
                             </div>
                         </div>
                     </div>

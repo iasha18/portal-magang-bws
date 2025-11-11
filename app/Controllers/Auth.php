@@ -3,12 +3,12 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
-use App\Models\BiodataModel; // 1. Panggil BiodataModel di sini
+use App\Models\BiodataModel; 
 
 class Auth extends BaseController
 {
-    // ... (Fungsi login, loginProses, logout, register tetap sama) ...
-    // ... (Silakan scroll ke bawah ke fungsi registerProses) ...
+    // --- (Fungsi login, loginProses, logout, register, registerProses) ---
+    // --- (Ini semua sudah benar dari sebelumnya) ---
 
     public function login()
     {
@@ -69,14 +69,12 @@ class Auth extends BaseController
         return view('auth/register', $data);
     }
 
-    // --- FUNGSI INI YANG KITA MODIFIKASI ---
     public function registerProses()
     {
         $session = session();
         $userModel = new UserModel();
-        $biodataModel = new BiodataModel(); // 2. Aktifkan BiodataModel
+        $biodataModel = new BiodataModel();
 
-        // Siapkan Aturan Validasi
         $aturan = [
             'nama' => ['rules' => 'required', 'errors' => ['required' => 'Nama lengkap wajib diisi.']],
             'email' => [
@@ -87,50 +85,179 @@ class Auth extends BaseController
                     'is_unique'   => 'Email ini sudah terdaftar. Silakan login.'
                 ]
             ],
-            'password' => [
-                'rules' => 'required|min_length[6]',
-                'errors' => [
-                    'required'   => 'Password wajib diisi.',
-                    'min_length' => 'Password minimal 6 karakter.'
-                ]
-            ],
-            'confpassword' => [
-                'rules' => 'matches[password]',
-                'errors' => ['matches' => 'Konfirmasi password tidak sama.']
-            ]
+            'password' => ['rules' => 'required|min_length[6]', 'errors' => ['required' => 'Password wajib diisi.', 'min_length' => 'Password minimal 6 karakter.']],
+            'confpassword' => ['rules' => 'matches[password]', 'errors' => ['matches' => 'Konfirmasi password tidak sama.']]
         ];
 
-        // Jalankan Validasi
         if (!$this->validate($aturan)) {
-            return redirect()->to(base_url('register'))
-                             ->withInput()
-                             ->with('errors', $this->validator->getErrors());
+            return redirect()->to(base_url('register'))->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // Jika Lolos Validasi, siapkan data user
         $dataUser = [
             'nama'     => $this->request->getVar('nama'),
             'email'    => $this->request->getVar('email'),
             'password' => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
             'role'     => 'mahasiswa'
         ];
-
-        // 3. Simpan data user ke tb_users
         $userModel->save($dataUser);
-
-        // --- [BAGIAN BARU] ---
-        // 4. Ambil ID dari user yang baru saja dibuat
         $idUserBaru = $userModel->getInsertID();
-
-        // 5. Buat data biodata kosong yang terhubung dengan ID user baru
-        $dataBiodata = [
-            'id_user' => $idUserBaru
-        ];
+        $dataBiodata = ['id_user' => $idUserBaru];
         $biodataModel->save($dataBiodata);
-        // --- Selesai Bagian Baru ---
 
-        // 6. Beri notifikasi sukses dan arahkan ke halaman Login
         $session->setFlashdata('pesan_sukses', 'Pendaftaran berhasil! Silakan login untuk melengkapi biodata.');
         return redirect()->to(base_url('login'));
+    }
+
+
+    // -------------------------------------------------------------------
+    // [FITUR LUPA PASSWORD]
+    // -------------------------------------------------------------------
+
+    /**
+     * 1. Menampilkan halaman form 'Lupa Password'
+     */
+    public function lupaPassword()
+    {
+        $data = [
+            'title' => 'Lupa Password'
+        ];
+        return view('auth/lupa_password', $data);
+    }
+
+    /**
+     * 2. Memproses pengiriman link reset via email (FUNGSI DIPERBAIKI)
+     */
+    public function kirimLinkReset()
+    {
+        $session = session();
+        $userModel = new UserModel();
+        $email = $this->request->getVar('email');
+        $user = $userModel->where('email', $email)->first();
+
+        // Cek apakah emailnya ada di database
+        if (!$user) {
+            $session->setFlashdata('pesan_error', 'Email tidak terdaftar di sistem.');
+            return redirect()->to(base_url('lupa-password'));
+        }
+
+        // 1. Buat Token Rahasia
+        $token = bin2hex(random_bytes(20));
+        $expires = date('Y-m-d H:i:s', time() + 3600); // Token berlaku 1 jam
+
+        // 2. Simpan token ke database
+        $userModel->update($user['id'], [
+            'reset_token' => $token,
+            'reset_token_expires' => $expires
+        ]);
+
+        // 3. Kirim email
+        $linkReset = base_url('reset-password/' . $token);
+        $subject = "Reset Password Akun Portal Magang BWS V";
+        $message = "Halo, " . $user['nama'] . ".<br><br>Kami menerima permintaan untuk mereset password Anda. Silakan klik link di bawah ini untuk membuat password baru:<br><br>"
+                   . "<a href='" . $linkReset . "' style='background-color: #0d6efd; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Reset Password Saya</a>"
+                   . "<br><br>Link ini hanya berlaku selama 1 jam.<br>Jika Anda tidak merasa meminta reset password, silakan abaikan email ini."
+                   . "<br><br>Terima kasih,<br>Admin BWS Sumatera V";
+
+        // --- [PERBAIKAN ERROR ADA DI SINI] ---
+        // Kita definisikan $emailTujuan sebelum memanggilnya
+        $emailTujuan = $user['email']; 
+        $emailTerkirim = $this->_kirimEmail($emailTujuan, $subject, $message);
+        // --- [SELESAI PERBAIKAN] ---
+
+        if ($emailTerkirim) {
+            $session->setFlashdata('pesan_sukses', 'Link reset password telah terkirim ke email Anda. Silakan cek inbox (atau folder spam).');
+        } else {
+            $session->setFlashdata('pesan_error', 'Gagal mengirim email. Cek konfigurasi SMTP Anda di app/Config/Email.php');
+        }
+
+        return redirect()->to(base_url('lupa-password'));
+    }
+
+    /**
+     * 3. Menampilkan form "Password Baru" (setelah link di email diklik)
+     */
+    public function resetPassword($token = null)
+    {
+        $userModel = new UserModel();
+        
+        if ($token == null) {
+            session()->setFlashdata('pesan_error', 'Token tidak valid.');
+            return redirect()->to(base_url('login'));
+        }
+
+        // Cari user berdasarkan token
+        $user = $userModel->where('reset_token', $token)->first();
+
+        if (!$user) {
+            session()->setFlashdata('pesan_error', 'Token tidak ditemukan atau tidak valid.');
+            return redirect()->to(base_url('login'));
+        }
+
+        // Cek apakah token sudah kedaluwarsa
+        if (strtotime($user['reset_token_expires']) < time()) {
+            session()->setFlashdata('pesan_error', 'Token sudah kedaluwarsa. Silakan minta reset baru.');
+            return redirect()->to(base_url('lupa-password'));
+        }
+
+        // Jika lolos semua, tampilkan form
+        $data = [
+            'title' => 'Buat Password Baru',
+            'token' => $token
+        ];
+        return view('auth/form_reset_password', $data);
+    }
+
+    /**
+     * 4. Memproses penyimpanan password baru
+     */
+    public function updatePasswordBaru()
+    {
+        $session = session();
+        $userModel = new UserModel();
+        $token = $this->request->getVar('token');
+        $password = $this->request->getVar('password');
+        $confpassword = $this->request->getVar('confpassword');
+
+        // Validasi password baru
+        if ($password !== $confpassword) {
+            return redirect()->to(base_url('reset-password/' . $token))->with('pesan_error', 'Konfirmasi password tidak cocok.');
+        }
+        if (strlen($password) < 6) {
+            return redirect()->to(base_url('reset-password/' . $token))->with('pesan_error', 'Password minimal 6 karakter.');
+        }
+
+        // Cari user berdasarkan token (untuk keamanan ganda)
+        $user = $userModel->where('reset_token', $token)->first();
+        if (!$user) {
+            session()->setFlashdata('pesan_error', 'Token tidak valid.');
+            return redirect()->to(base_url('login'));
+        }
+
+        // Update password baru & hapus tokennya
+        $userModel->update($user['id'], [
+            'password' => password_hash($password, PASSWORD_DEFAULT),
+            'reset_token' => null, // Hapus token agar tidak bisa dipakai lagi
+            'reset_token_expires' => null
+        ]);
+
+        $session->setFlashdata('pesan_sukses', 'Password berhasil diperbarui! Silakan login.');
+        return redirect()->to(base_url('login'));
+    }
+    
+    
+    // Fungsi helper kirim email (Salin dari Admin.php jika belum ada)
+    private function _kirimEmail($to, $subject, $message)
+    {
+        $email = \Config\Services::email();
+        $email->setTo($to);
+        $email->setSubject($subject);
+        $email->setMessage($message); // Asumsikan $message sudah HTML
+        
+        if ($email->send()) {
+            return true;
+        } else {
+            log_message('error', $email->printDebugger(['headers']));
+            return false;
+        }
     }
 }

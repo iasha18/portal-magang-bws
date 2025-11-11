@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <style>
+<style>
         /* --- PENGATURAN GLOBAL --- */
         :root { --bs-primary: #0d6efd; --bs-primary-rgb: 13, 110, 253; }
         body { font-family: 'Poppins', sans-serif; background-color: #f9fafb; color: #4b5563; display: flex; flex-direction: column; min-height: 100vh; }
@@ -64,14 +64,18 @@
     <nav class="navbar navbar-expand-lg bg-white shadow-sm fixed-top py-3">
       <div class="container">
         <a class="navbar-brand d-flex align-items-center" href="<?= base_url('/') ?>">MAGANG BWS SUMATERA V</a>
-        <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto align-items-center fw-medium">
             <li class="nav-item"><a class="nav-link px-3" href="<?= base_url('/') ?>">Beranda</a></li>
             <li class="nav-item"><a class="nav-link px-3" href="<?= base_url('/') ?>#lowongan">Lowongan</a></li>
             <?php if (session()->get('is_logged_in')) : ?>
                 <li class="nav-item dropdown ms-2">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user-circle me-1"></i> <?= session()->get('user_nama'); ?></a>
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle me-1"></i> <?= session()->get('user_nama'); ?>
+                    </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <?php if (session()->get('user_role') == 'admin') : ?>
                             <li><a class="dropdown-item" href="<?= base_url('admin/lowongan') ?>">Dashboard Admin</a></li>
@@ -83,7 +87,7 @@
                     </ul>
                 </li>
             <?php else : ?>
-                <li class="nav-item ms-2"><a class="btn btn-primary rounded-pill px-4 fw-bold" href="<?= base_url('login') ?>">Masuk</a></li>
+                <li class="nav-item ms-2"><a class="btn-masuk-custom" href="<?= base_url('login') ?>">Masuk</a></li>
             <?php endif; ?>
           </ul>
         </div>
@@ -104,7 +108,9 @@
                 <div class="col-lg-3 offset-xl-1">
                     <h6 class="fw-bold text-white text-uppercase mb-3" style="letter-spacing: 1px; font-size: 0.8rem;">Hubungi Kami</h6>
                     <ul class="list-unstyled text-white-50 mb-0" style="line-height: 2;">
-                        <li>Jl. Khatib Sulaiman No.86A, Padang</li><li>(0751) 7058350</li><li>bws.sv@pu.go.id</li>
+                        <li>Jl. Khatib Sulaiman No.86A, Padang</li>
+                        <li>(0751) 7058350</li>
+                        <li>bws.sv@pu.go.id</li>
                     </ul>
                 </div>
                 <div class="col-lg-3">

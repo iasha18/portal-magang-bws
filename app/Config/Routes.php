@@ -17,17 +17,21 @@ $routes->get('logout', 'Auth::logout');
 $routes->get('register', 'Auth::register');
 $routes->post('register/proses', 'Auth::registerProses');
 
+$routes->get('lupa-password', 'Auth::lupaPassword');
+$routes->post('lupa-password/kirim', 'Auth::kirimLinkReset');
+$routes->get('reset-password/(:any)', 'Auth::resetPassword/$1');
+$routes->post('reset-password/update', 'Auth::updatePasswordBaru');
+
 // 3. RUTE PESERTA
 $routes->group('peserta', ['filter' => 'auth'], function($routes) {
     $routes->get('/', 'Peserta::index');
     $routes->get('apply/(:num)', 'Peserta::apply/$1');
-    // RUTE BARU: PROFIL & BIODATA
-    $routes->get('profil', 'Peserta::profil'); // Menampilkan form edit profil
-    $routes->post('profil/update', 'Peserta::updateProfil'); // Proses simpan/update profil
+    $routes->get('profil', 'Peserta::profil');
+    $routes->post('profil/update', 'Peserta::updateProfil');
 });
 
 // 4. RUTE ADMIN
-$routes->group('admin', ['filter' => 'auth'], function($routes) {
+$routes->group('admin', ['filter' => 'auth'], function($routes) { // <-- Grup Admin Dibuka
     $routes->get('/', 'Admin::index');
     
     // Lowongan
@@ -41,7 +45,14 @@ $routes->group('admin', ['filter' => 'auth'], function($routes) {
     // Pendaftar
     $routes->get('pendaftar', 'Admin::pendaftar');
     $routes->get('pendaftar/update/(:num)/(:segment)', 'Admin::updateStatus/$1/$2');
-    
-    // [INI RUTE PENTINGNYA] Pastikan baris ini ada
     $routes->get('pendaftar/detail/(:num)', 'Admin::detailPendaftar/$1');
-});
+    $routes->get('pendaftar/hapus/(:num)', 'Admin::hapusPendaftar/$1');
+
+    // Kelola Admin (dijaga 'auth' DAN 'superadmin')
+    $routes->group('users', ['filter' => 'superadmin'], function($routes) { // <-- Grup Users Dibuka
+        $routes->get('/', 'Admin::kelolaAdmin');
+        $routes->get('tambah', 'Admin::tambahAdmin');
+        $routes->post('simpan', 'Admin::simpanAdmin');
+    }); // <-- Grup Users Ditutup
+
+}); // <-- [PERBAIKAN] Ini adalah penutup untuk Grup Admin
