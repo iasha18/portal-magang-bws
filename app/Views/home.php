@@ -133,11 +133,13 @@
                                 <div class="text-muted small fw-bold">
                                     <i class="fas fa-users me-2 text-primary opacity-50"></i>Kuota: <?= $job['kebutuhan']; ?>
                                 </div>
-                                <a href="<?= base_url('peserta/apply/' . $job['id']) ?>" 
-                                   class="btn btn-primary rounded-pill px-4 fw-bold"
-                                   onclick="return confirm('Anda yakin ingin melamar di posisi <?= esc($job['posisi']) ?> ini?')">
-                                    Apply Now
-                                </a>
+                                <?php if (!session()->get('is_logged_in') || session()->get('user_role') == 'mahasiswa'): ?>
+    <a href="<?= base_url('peserta/apply/' . $job['id']) ?>" 
+       class="btn btn-primary rounded-pill px-4 fw-bold"
+       onclick="return confirm('Anda yakin ingin melamar di posisi <?= esc($job['posisi']) ?> ini?')">
+        Apply Now
+    </a>
+<?php endif; ?>
                             </div>
                         </div>
                     </div>

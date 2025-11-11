@@ -6,19 +6,18 @@ use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class SuperAdminFilter implements FilterInterface
+class PesertaFilter implements FilterInterface
 {
     /**
-     * Tugas Satpam: Cek apakah role-nya 'superadmin'.
+     * Tugas Satpam: Cek apakah role-nya 'mahasiswa'.
      */
     public function before(RequestInterface $request, $arguments = null)
     {
-        // Cek: Apakah peran user BUKAN 'superadmin'?
-        if (session()->get('user_role') !== 'superadmin') {
+        // Jika rolenya BUKAN 'mahasiswa' (misal: admin atau superadmin)
+        if (session()->get('user_role') !== 'mahasiswa') {
             
-            // Jika bukan, lempar dia kembali ke dashboard admin biasa
-            // Sambil bawa pesan error
-            session()->setFlashdata('pesan_error', 'Anda tidak memiliki hak akses ke halaman tersebut.');
+            // Lempar dia kembali ke dashboard-nya sendiri (admin)
+            session()->setFlashdata('pesan_error', 'Akses ditolak. Anda login sebagai Admin.');
             return redirect()->to(base_url('admin'));
         }
     }

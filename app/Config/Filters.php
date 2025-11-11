@@ -15,15 +15,6 @@ use CodeIgniter\Filters\SecureHeaders;
 
 class Filters extends BaseFilters
 {
-    /**
-     * Configures aliases for Filter classes to
-     * make reading things nicer and simpler.
-     *
-     * @var array<string, class-string|list<class-string>>
-     *
-     * [filter_name => classname]
-     * or [filter_name => [classname1, classname2, ...]]
-     */
     public array $aliases = [
         'csrf'          => CSRF::class,
         'toolbar'       => DebugToolbar::class,
@@ -36,61 +27,17 @@ class Filters extends BaseFilters
         'performance'   => PerformanceMetrics::class,
         
         // --- FILTER KUSTOM KITA ---
-        'auth'          => \App\Filters\AuthFilter::class, // Untuk cek sudah login atau belum
-        'superadmin'    => \App\Filters\SuperAdminFilter::class, // Untuk cek apakah rolenya superadmin
+        'auth'          => \App\Filters\AuthFilter::class, // Cek sudah login
+        'peserta'       => \App\Filters\PesertaFilter::class, // Cek rolenya 'mahasiswa'
+        'superadmin'    => \App\Filters\SuperAdminFilter::class, // Cek rolenya 'superadmin'
     ];
 
-    /**
-     * List of special required filters.
-     *
-     * @var array{before: list<string>, after: list<string>}
-     */
+    // ... (Sisa file biarkan default) ...
     public array $required = [
-        'before' => [
-            'forcehttps', // Force Global Secure Requests
-            'pagecache',  // Web Page Caching
-        ],
-        'after' => [
-            'pagecache',   // Web Page Caching
-            'performance', // Performance Metrics
-            'toolbar',     // Debug Toolbar
-        ],
+        'before' => ['forcehttps', 'pagecache'],
+        'after'  => ['pagecache', 'performance', 'toolbar'],
     ];
-
-    /**
-     * List of filter aliases that are always
-     * applied before and after every request.
-     *
-     * @var array{
-     * before: array<string, array{except: list<string>|string}>|list<string>,
-     * after: array<string, array{except: list<string>|string}>|list<string>
-     * }
-     */
-    public array $globals = [
-        'before' => [
-            // 'honeypot',
-            // 'csrf',
-            // 'invalidchars',
-        ],
-        'after' => [
-            // 'honeypot',
-            // 'secureheaders',
-        ],
-    ];
-
-    /**
-     * List of filter aliases that works on a
-     * particular HTTP method (GET, POST, etc.).
-     *
-     * @var array<string, list<string>>
-     */
+    public array $globals = ['before' => [], 'after' => []];
     public array $methods = [];
-
-    /**
-     * List of filter aliases that should run on any
-     * before or after URI patterns.
-     *
-     * @var array<string, array<string, list<string>>>
-     */
     public array $filters = [];
 }
