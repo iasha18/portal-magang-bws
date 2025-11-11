@@ -87,6 +87,13 @@
                     <i class="fas fa-users"></i> Data Pendaftar
                 </a>
             </li>
+            <?php if (session()->get('user_role') == 'superadmin'): ?>
+                <li class="nav-item">
+                    <a class="nav-link <?= (strpos(uri_string(), 'admin/users') !== false) ? 'active' : '' ?>" href="<?= base_url('admin/users') ?>">
+                        <i class="fas fa-user-shield"></i> Kelola Admin
+                    </a>
+                </li>
+            <?php endif; ?>     
             <hr class="text-secondary">
             <li class="nav-item">
                 <a class="nav-link" href="<?= base_url('/') ?>" target="_blank">

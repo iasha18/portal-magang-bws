@@ -17,16 +17,13 @@ class Admin extends BaseController
 
     public function __construct()
     {
-        // Aktifkan semua Model
         $this->lowonganModel = new LowonganModel();
         $this->lamaranModel = new LamaranModel();
         $this->biodataModel = new BiodataModel();
         $this->userModel = new UserModel();
     }
 
-    /**
-     * Halaman Dashboard Admin
-     */
+    // Halaman Dashboard Admin
     public function index()
     {
         $total_lowongan = $this->lowonganModel->countAllResults();
@@ -55,7 +52,7 @@ class Admin extends BaseController
     }
 
     // -------------------------------------------------------------------
-    // [DIKEMBALIKAN] FITUR KELOLA LOWONGAN (CRUD)
+    // FITUR KELOLA LOWONGAN (CRUD)
     // -------------------------------------------------------------------
 
     public function lowongan()
@@ -119,7 +116,7 @@ class Admin extends BaseController
     }
 
     // -------------------------------------------------------------------
-    // [DIKEMBALIKAN] FITUR KELOLA PENDAFTAR
+    // FITUR KELOLA PENDAFTAR
     // -------------------------------------------------------------------
 
     public function pendaftar()
@@ -212,7 +209,7 @@ class Admin extends BaseController
     }
     
     // -------------------------------------------------------------------
-    // [DIKEMBALIKAN] FITUR KELOLA ADMIN
+    // FITUR KELOLA ADMIN
     // -------------------------------------------------------------------
     public function kelolaAdmin()
     {
