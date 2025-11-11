@@ -3,59 +3,17 @@
 <?= $this->section('content'); ?>
 
 <style>
-    /* CSS Khusus Halaman Login agar lebih premium */
-    body {
-        background-color: #f0f2f5; /* Background halaman lebih netral */
-    }
-    .login-container {
-        min-height: 85vh; /* Sedikit lebih tinggi agar posisi vertikal lebih pas */
-    }
-    .login-card {
-        border: none;
-        border-radius: 20px; /* Sudut lebih bulat */
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); /* Bayangan lembut tapi dalam */
-        overflow: hidden;
-    }
-    .login-header {
-        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); /* Gradient biru profesional */
-        padding: 30px 20px;
-        text-align: center;
-        color: white;
-    }
-    .nav-pills .nav-link {
-        color: #6c757d;
-        font-weight: 600;
-        padding: 12px 20px;
-        border-radius: 10px;
-        transition: all 0.3s;
-    }
-    .nav-pills .nav-link.active {
-        background-color: #0d6efd; /* Biru untuk tab aktif */
-        color: white;
-        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
-    }
-    /* Khusus tab admin warnanya beda sedikit agar jelas */
-    .nav-pills .nav-link#pills-admin-tab.active {
-        background-color: #dc3545; /* Merah untuk admin */
-        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
-    }
-    .form-control {
-        padding: 12px 15px;
-        border-radius: 10px;
-        border: 1px solid #dee2e6;
-        background-color: #f8f9fa;
-    }
-    .form-control:focus {
-        background-color: #fff;
-        box-shadow: none;
-        border-color: #0d6efd;
-    }
-    .btn-login {
-        padding: 12px;
-        border-radius: 10px;
-        font-weight: 700;
-        letter-spacing: 1px;
-    }
+    /* ... (CSS Anda yang sudah profesional ada di sini) ... */
+    body { background-color: #f0f2f5; }
+    .login-container { min-height: 85vh; }
+    .login-card { border: none; border-radius: 20px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); overflow: hidden; }
+    .login-header { background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); padding: 30px 20px; text-align: center; color: white; }
+    .nav-pills .nav-link { color: #6c757d; font-weight: 600; padding: 12px 20px; border-radius: 10px; transition: all 0.3s; }
+    .nav-pills .nav-link.active { background-color: #0d6efd; color: white; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3); }
+    .nav-pills .nav-link#pills-admin-tab.active { background-color: #dc3545; box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3); }
+    .form-control { padding: 12px 15px; border-radius: 10px; border: 1px solid #dee2e6; background-color: #f8f9fa; }
+    .form-control:focus { background-color: #fff; box-shadow: none; border-color: #0d6efd; }
+    .btn-login { padding: 12px; border-radius: 10px; font-weight: 700; letter-spacing: 1px; }
 </style>
 
 <div class="container login-container d-flex align-items-center justify-content-center">
@@ -98,6 +56,8 @@
                     <div class="tab-pane fade show active" id="pills-peserta" role="tabpanel">
                         <form action="<?= base_url('login/proses') ?>" method="post">
                             <?= csrf_field() ?>
+                            <input type="hidden" name="login_type" value="mahasiswa">
+                            
                             <div class="mb-3">
                                 <label for="email-peserta" class="form-label small text-muted fw-bold ms-1">Email Peserta</label>
                                 <div class="input-group">
@@ -131,6 +91,8 @@
                         </div>
                         <form action="<?= base_url('login/proses') ?>" method="post">
                             <?= csrf_field() ?>
+                            <input type="hidden" name="login_type" value="admin">
+
                             <div class="mb-3">
                                 <label class="form-label small text-muted fw-bold ms-1">Email Admin</label>
                                 <div class="input-group">

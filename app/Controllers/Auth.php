@@ -33,23 +33,41 @@ class Auth extends BaseController
     {
         $session = session();
         $userModel = new UserModel();
+        
         $email = $this->request->getVar('email');
         $password = $this->request->getVar('password');
+        $loginType = $this->request->getVar('login_type'); // Ambil 'penanda'
+        
         $dataUser = $userModel->where('email', $email)->first();
 
         if ($dataUser) {
             if (password_verify($password, $dataUser['password'])) {
-                // Login Sukses! Buat session.
+                
+                $roleAsli = $dataUser['role']; // 'admin', 'superadmin', atau 'mahasiswa'
+
+                // KASUS 1: Admin/Super Admin login di form Peserta
+                if (($roleAsli == 'admin' || $roleAsli == 'superadmin') && $loginType == 'mahasiswa') {
+                    $session->setFlashdata('pesan_error', 'Akun Admin tidak bisa login di form Peserta. Gunakan tab Admin.');
+                    return redirect()->to(base_url('login'));
+                }
+                
+                // KASUS 2: Peserta login di form Admin
+                if ($roleAsli == 'mahasiswa' && $loginType == 'admin') {
+                     $session->setFlashdata('pesan_error', 'Akun ini bukan Admin. Gunakan tab Peserta.');
+                    return redirect()->to(base_url('login'));
+                }
+
+                // SUKSES LOGIN
                 $sessLogin = [
                     'is_logged_in' => true,
                     'user_id'      => $dataUser['id'],
                     'user_nama'    => $dataUser['nama'],
-                    'user_role'    => $dataUser['role']
+                    'user_role'    => $roleAsli
                 ];
                 $session->set($sessLogin);
 
                 // [PERBAIKAN] Arahkan 'admin' DAN 'superadmin' ke halaman admin
-                if ($dataUser['role'] == 'admin' || $dataUser['role'] == 'superadmin') {
+                if ($roleAsli == 'admin' || $roleAsli == 'superadmin') {
                     return redirect()->to(base_url('admin')); // Arahkan ke dashboard admin
                 } else {
                     return redirect()->to(base_url('peserta')); // Arahkan ke Dashboard Peserta
@@ -123,9 +141,114 @@ class Auth extends BaseController
     }
 
     // --- (Fungsi Lupa Password) ---
-    public function lupaPassword() { /* ... */ }
-    public function kirimLinkReset() { /* ... */ }
-    public function resetPassword($token = null) { /* ... */ }
-    public function updatePasswordBaru() { /* ... */ }
-    private function _kirimEmail($to, $subject, $message) { /* ... */ }
+    
+    public function lupaPassword()
+    {
+        $data = ['title' => 'Lupa Password'];
+        return view('auth/lupa_password', $data);
+    }
+
+    public function kirimLinkReset()
+    {
+        $session = session();
+        $userModel = new UserModel();
+        $email = $this->request->getVar('email');
+        $user = $userModel->where('email', $email)->first();
+
+        if (!$user) {
+            $session->setFlashdata('pesan_error', 'Email tidak terdaftar di sistem.');
+            return redirect()->to(base_url('lupa-password'));
+        }
+
+        $token = bin2hex(random_bytes(20));
+        $expires = date('Y-m-d H:i:s', time() + 3600); // 1 jam
+
+        $userModel->update($user['id'], [
+            'reset_token' => $token,
+            'reset_token_expires' => $expires
+        ]);
+
+        $linkReset = base_url('reset-password/' . $token);
+        $subject = "Reset Password Akun Portal Magang BWS V";
+        $message = "Halo, " . $user['nama'] . ".<br><br>Kami menerima permintaan untuk mereset password Anda. Silakan klik link di bawah ini:<br><br>"
+                   . "<a href='" . $linkReset . "' style='background-color: #0d6efd; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Reset Password Saya</a>"
+                   . "<br><br>Link ini hanya berlaku selama 1 jam.";
+
+        $emailTujuan = $user['email']; 
+        $emailTerkirim = $this->_kirimEmail($emailTujuan, $subject, $message);
+
+        if ($emailTerkirim) {
+            $session->setFlashdata('pesan_sukses', 'Link reset password telah terkirim ke email Anda.');
+        } else {
+            $session->setFlashdata('pesan_error', 'Gagal mengirim email. Cek konfigurasi SMTP Anda.');
+        }
+
+        return redirect()->to(base_url('lupa-password'));
+    }
+
+    public function resetPassword($token = null)
+    {
+        $userModel = new UserModel();
+        if ($token == null) {
+            session()->setFlashdata('pesan_error', 'Token tidak valid.');
+            return redirect()->to(base_url('login'));
+        }
+        $user = $userModel->where('reset_token', $token)->first();
+        if (!$user) {
+            session()->setFlashdata('pesan_error', 'Token tidak ditemukan.');
+            return redirect()->to(base_url('login'));
+        }
+        if (strtotime($user['reset_token_expires']) < time()) {
+            session()->setFlashdata('pesan_error', 'Token sudah kedaluwarsa.');
+            return redirect()->to(base_url('lupa-password'));
+        }
+        $data = ['title' => 'Buat Password Baru', 'token' => $token];
+        return view('auth/form_reset_password', $data);
+    }
+
+    public function updatePasswordBaru()
+    {
+        $session = session();
+        $userModel = new UserModel();
+        $token = $this->request->getVar('token');
+        $password = $this->request->getVar('password');
+        $confpassword = $this->request->getVar('confpassword');
+
+        if ($password !== $confpassword) {
+            return redirect()->to(base_url('reset-password/' . $token))->with('pesan_error', 'Konfirmasi password tidak cocok.');
+        }
+        if (strlen($password) < 6) {
+            return redirect()->to(base_url('reset-password/' . $token))->with('pesan_error', 'Password minimal 6 karakter.');
+        }
+
+        $user = $userModel->where('reset_token', $token)->first();
+        if (!$user) {
+            session()->setFlashdata('pesan_error', 'Token tidak valid.');
+            return redirect()->to(base_url('login'));
+        }
+
+        $userModel->update($user['id'], [
+            'password' => password_hash($password, PASSWORD_DEFAULT),
+            'reset_token' => null,
+            'reset_token_expires' => null
+        ]);
+
+        $session->setFlashdata('pesan_sukses', 'Password berhasil diperbarui! Silakan login.');
+        return redirect()->to(base_url('login'));
+    }
+    
+    private function _kirimEmail($to, $subject, $message)
+    {
+        $email = \Config\Services::email();
+        $email->setTo($to);
+        $email->setSubject($subject);
+        $email->setMessage($message); // Asumsikan $message sudah HTML
+        
+        if ($email->send()) {
+            return true;
+        } else {
+            log_message('error', $email->printDebugger(['headers']));
+            return false;
+        }
+    }
 }

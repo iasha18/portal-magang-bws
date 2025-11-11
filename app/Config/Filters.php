@@ -15,6 +15,9 @@ use CodeIgniter\Filters\SecureHeaders;
 
 class Filters extends BaseFilters
 {
+    /**
+     * Configures aliases for Filter classes.
+     */
     public array $aliases = [
         'csrf'          => CSRF::class,
         'toolbar'       => DebugToolbar::class,
@@ -27,17 +30,52 @@ class Filters extends BaseFilters
         'performance'   => PerformanceMetrics::class,
         
         // --- FILTER KUSTOM KITA ---
-        'auth'          => \App\Filters\AuthFilter::class, // Cek sudah login
-        'peserta'       => \App\Filters\PesertaFilter::class, // Cek rolenya 'mahasiswa'
-        'superadmin'    => \App\Filters\SuperAdminFilter::class, // Cek rolenya 'superadmin'
+        'auth'          => \App\Filters\AuthFilter::class,       // Cek: Apakah sudah login?
+        'peserta'       => \App\Filters\PesertaFilter::class,    // Cek: Apakah rolenya 'mahasiswa'?
+        'superadmin'    => \App\Filters\SuperAdminFilter::class, // Cek: Apakah rolenya 'superadmin'?
+        'admin'         => \App\Filters\AdminFilter::class,      // [SAT PAM BARU] Cek: Apakah rolenya 'admin' atau 'superadmin'?
     ];
 
-    // ... (Sisa file biarkan default) ...
+    /**
+     * List of special required filters.
+     */
     public array $required = [
-        'before' => ['forcehttps', 'pagecache'],
-        'after'  => ['pagecache', 'performance', 'toolbar'],
+        'before' => [
+            'forcehttps',
+            'pagecache',
+        ],
+        'after' => [
+            'pagecache',
+            'performance',
+            'toolbar',
+        ],
     ];
-    public array $globals = ['before' => [], 'after' => []];
+
+    /**
+     * List of filter aliases that are always
+     * applied before and after every request.
+     */
+    public array $globals = [
+        'before' => [
+            // 'honeypot',
+            // 'csrf',
+            // 'invalidchars',
+        ],
+        'after' => [
+            // 'honeypot',
+            // 'secureheaders',
+        ],
+    ];
+
+    /**
+     * List of filter aliases that works on a
+     * particular HTTP method (GET, POST, etc.).
+     */
     public array $methods = [];
+
+    /**
+     * List of filter aliases that should run on any
+     * before or after URI patterns.
+     */
     public array $filters = [];
 }
