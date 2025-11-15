@@ -8,7 +8,8 @@
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class_("text-muted small text-uppercase fw-bold">Total Lowongan</div>
+                        <!-- (Saya juga perbaiki typo 'class_' menjadi 'class') -->
+                        <div class="text-muted small text-uppercase fw-bold">Total Lowongan</div>
                         <h3 class="fw-bold mb-0"><?= $total_lowongan; ?></h3>
                     </div>
                     <i class="fas fa-briefcase fa-3x text-primary opacity-50"></i>
@@ -21,7 +22,7 @@
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class_("text-muted small text-uppercase fw-bold">Lamaran Masuk</div>
+                        <div class="text-muted small text-uppercase fw-bold">Lamaran Masuk</div>
                         <h3 class="fw-bold mb-0"><?= $total_lamaran; ?></h3>
                     </div>
                     <i class="fas fa-file-invoice fa-3x text-success opacity-50"></i>
@@ -34,7 +35,7 @@
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class_("text-muted small text-uppercase fw-bold">Lamaran Pending</div>
+                        <div class="text-muted small text-uppercase fw-bold">Lamaran Pending</div>
                         <h3 class="fw-bold mb-0"><?= $total_pending; ?></h3>
                     </div>
                     <i class="fas fa-clock fa-3x text-warning opacity-50"></i>
@@ -47,7 +48,7 @@
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class_("text-muted small text-uppercase fw-bold">Total Peserta</div>
+                        <div class="text-muted small text-uppercase fw-bold">Total Peserta</div>
                         <h3 class="fw-bold mb-0"><?= $total_peserta; ?></h3>
                     </div>
                     <i class="fas fa-users fa-3x text-info opacity-50"></i>
@@ -79,9 +80,14 @@
                     <?php else: ?>
                         <?php foreach ($pendaftar_terbaru as $pendaftar): ?>
                             <tr>
-                                <td class="fw-bold"><?= esc($pendaftar['nama']); ?></td>
-                                <td><?= esc($pendaftar['posisi']); ?></td>
-                                <td><?= date('d M Y, H:i', strtotime($pendaftar['tanggal_melamar'])); ?> WIB</td>
+                                <!-- 
+                                =====================================================
+                                PERBAIKAN DI 3 BARIS BERIKUT: [ ] diubah menjadi ->
+                                =====================================================
+                                -->
+                                <td class="fw-bold"><?= esc($pendaftar->nama); ?></td>
+                                <td><?= esc($pendaftar->posisi); ?></td>
+                                <td><?= date('d M Y, H:i', strtotime($pendaftar->tanggal_melamar)); ?> WIB</td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>

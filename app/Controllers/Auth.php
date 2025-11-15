@@ -12,13 +12,13 @@ class Auth extends BaseController
      */
     public function login()
     {
-        // [PERBAIKAN] Cek apakah 'admin' ATAU 'superadmin'
+        // Jika user sudah login, langsung arahkan ke halaman yang seharusnya
         if (session()->get('is_logged_in')) {
             if (session()->get('user_role') == 'admin' || session()->get('user_role') == 'superadmin') {
-                return redirect()->to(base_url('admin'));
+                return redirect()->to(base_url('admin')); // Langsung ke Dashboard Admin
             }
             if (session()->get('user_role') == 'mahasiswa') {
-                 return redirect()->to(base_url('peserta'));
+                 return redirect()->to(base_url('peserta')); // Langsung ke Dashboard Peserta
             }
         }
 
@@ -36,24 +36,22 @@ class Auth extends BaseController
         
         $email = $this->request->getVar('email');
         $password = $this->request->getVar('password');
-        $loginType = $this->request->getVar('login_type'); // Ambil 'penanda'
+        $loginType = $this->request->getVar('login_type'); // Ambil 'penanda' dari form (admin atau mahasiswa)
         
         $dataUser = $userModel->where('email', $email)->first();
 
         if ($dataUser) {
             if (password_verify($password, $dataUser['password'])) {
                 
-                $roleAsli = $dataUser['role']; // 'admin', 'superadmin', atau 'mahasiswa'
+                $roleAsli = $dataUser['role']; 
 
-                // KASUS 1: Admin/Super Admin login di form Peserta
-                if (($roleAsli == 'admin' || $roleAsli == 'superadmin') && $loginType == 'mahasiswa') {
-                    $session->setFlashdata('pesan_error', 'Akun Admin tidak bisa login di form Peserta. Gunakan tab Admin.');
+                // [LOGIKA KEAMANAN] Mencegah salah form login
+                if ($loginType == 'admin' && ($roleAsli !== 'admin' && $roleAsli !== 'superadmin')) {
+                    $session->setFlashdata('pesan_error', 'Akun ini bukan Admin. Gunakan tab Peserta.');
                     return redirect()->to(base_url('login'));
                 }
-                
-                // KASUS 2: Peserta login di form Admin
-                if ($roleAsli == 'mahasiswa' && $loginType == 'admin') {
-                     $session->setFlashdata('pesan_error', 'Akun ini bukan Admin. Gunakan tab Peserta.');
+                if ($loginType == 'mahasiswa' && ($roleAsli == 'admin' || $roleAsli == 'superadmin')) {
+                    $session->setFlashdata('pesan_error', 'Akun Admin tidak bisa login di form Peserta. Gunakan tab Admin.');
                     return redirect()->to(base_url('login'));
                 }
 
@@ -66,11 +64,11 @@ class Auth extends BaseController
                 ];
                 $session->set($sessLogin);
 
-                // [PERBAIKAN] Arahkan 'admin' DAN 'superadmin' ke halaman admin
+                // Arahkan ke Dashboard yang sesuai
                 if ($roleAsli == 'admin' || $roleAsli == 'superadmin') {
-                    return redirect()->to(base_url('admin')); // Arahkan ke dashboard admin
+                    return redirect()->to(base_url('admin'));
                 } else {
-                    return redirect()->to(base_url('peserta')); // Arahkan ke Dashboard Peserta
+                    return redirect()->to(base_url('peserta'));
                 }
             } else {
                 $session->setFlashdata('pesan_error', 'Password salah!');
@@ -242,7 +240,7 @@ class Auth extends BaseController
         $email = \Config\Services::email();
         $email->setTo($to);
         $email->setSubject($subject);
-        $email->setMessage($message); // Asumsikan $message sudah HTML
+        $email->setMessage($message); 
         
         if ($email->send()) {
             return true;

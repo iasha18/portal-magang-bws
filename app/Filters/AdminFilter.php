@@ -10,23 +10,22 @@ class AdminFilter implements FilterInterface
 {
     /**
      * Tugas Satpam: Cek apakah user yang login adalah Admin atau Super Admin.
-     * Filter ini harus dijalankan SETELAH filter 'auth' (yang mengecek login).
      */
     public function before(RequestInterface $request, $arguments = null)
     {
         $role = session()->get('user_role');
 
-        // Jika rolenya BUKAN 'admin' DAN BUKAN 'superadmin'
+        // Jika rolenya BUKAN 'admin' DAN BUKAN 'superadmin' (berarti 'mahasiswa')
         if ($role !== 'admin' && $role !== 'superadmin') {
             
-            // Berarti dia 'mahasiswa' atau 'peserta'. Lempar dia ke dashboard-nya.
-            session()->setFlashdata('pesan_error', 'Akses ditolak! Anda tidak memiliki hak akses ke Halaman Admin.');
-            return redirect()->to(base_url('peserta')); // Arahkan ke dashboard peserta
+            // Lempar dia kembali ke dashboard peserta
+            session()->setFlashdata('pesan_error', 'Akses ditolak! Halaman ini hanya untuk Administrator.');
+            return redirect()->to(base_url('peserta'));
         }
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        // Tidak perlu melakukan apa-apa setelah halaman dimuat
+        // ...
     }
 }

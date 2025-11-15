@@ -3,17 +3,13 @@
 <?= $this->section('content'); ?>
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-11"> <!-- Dibuat lebih lebar -->
-            
-            <!-- Kartu Selamat Datang -->
-            <div class="card shadow-soft border-0 rounded-4 mb-4 overflow-hidden">
+        <div class="col-lg-11"> <div class="card shadow-soft border-0 rounded-4 mb-4 overflow-hidden">
                 <div class="card-body p-5 bg-primary text-white" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
                     <h2 class="fw-bold">Halo, <?= session()->get('user_nama'); ?>! 👋</h2>
                     <p class="lead mb-0 opacity-75">Selamat datang di Dashboard Peserta Magang BWS SUMATERA V.</p>
                 </div>
             </div>
 
-            <!-- Notifikasi (jika ada pesan sukses/error) -->
             <?php if (session()->getFlashdata('pesan_sukses')): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="fas fa-check-circle me-2"></i>
@@ -30,7 +26,6 @@
             <?php endif; ?>
 
             <div class="row g-4">
-                <!-- Kolom Kiri (Besar): Daftar Lamaran -->
                 <div class="col-lg-8">
                     <div class="card shadow-sm border-0 rounded-4 h-100">
                         <div class="card-header bg-white border-0 p-4">
@@ -58,13 +53,12 @@
                                         <tbody>
                                             <?php foreach ($daftar_lamaran as $lamaran): ?>
                                                 <tr>
-                                                    <td class="p-3 fw-bold"><?= esc($lamaran['posisi']); ?></td>
-                                                    <td><?= esc($lamaran['unit']); ?></td>
-                                                    <td><?= date('d M Y, H:i', strtotime($lamaran['tanggal_melamar'])); ?></td>
+                                                    <td class="p-3 fw-bold"><?= esc($lamaran->posisi); ?></td>
+                                                    <td><?= esc($lamaran->unit); ?></td>
+                                                    <td><?= date('d M Y, H:i', strtotime($lamaran->tanggal_melamar)); ?></td>
                                                     <td>
-                                                        <!-- [PERBAIKAN] Badge Status Dinamis -->
                                                         <?php 
-                                                            $status = $lamaran['status_lamaran'];
+                                                            $status = $lamaran->status_lamaran; // Diubah
                                                             $badge_color = 'bg-warning text-dark'; // Default (Pending)
                                                             if ($status == 'Diterima') {
                                                                 $badge_color = 'bg-success';
@@ -84,7 +78,6 @@
                     </div>
                 </div>
 
-                <!-- Kolom Kanan (Kecil): Profil Saya -->
                 <div class="col-lg-4">
                     <div class="card shadow-sm border-0 rounded-4 h-100">
                         <div class="card-header bg-white border-0 p-4">
@@ -92,7 +85,6 @@
                         </div>
                         <div class="card-body p-4 d-flex flex-column">
                             <p class="text-muted small">
-                                <!-- Cek apakah biodata sudah diisi atau belum -->
                                 <?php if (empty($biodata) || empty($biodata['nim'])): ?>
                                     Profil Anda belum lengkap. Silakan lengkapi biodata dan upload dokumen.
                                 <?php else: ?>
@@ -100,7 +92,6 @@
                                 <?php endif; ?>
                             </p>
                             <div class="mt-auto">
-                                <!-- Tombol "Lengkapi Profil" yang sudah berfungsi -->
                                 <a href="<?= base_url('peserta/profil') ?>" class="btn btn-warning rounded-pill fw-bold px-4 w-100">
                                     <i class="fas fa-pen me-1"></i> 
                                     <?= (empty($biodata) || empty($biodata['nim'])) ? 'Lengkapi Profil' : 'Edit Profil'; ?>
@@ -110,8 +101,7 @@
                     </div>
                 </div>
 
-            </div> <!-- end row g-4 -->
-        </div>
+            </div> </div>
     </div>
 </div>
 <?= $this->endSection(); ?>

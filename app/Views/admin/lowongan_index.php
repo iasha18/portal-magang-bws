@@ -43,21 +43,24 @@
                         <?php foreach ($lowongan as $job) : ?>
                             <tr>
                                 <th scope="row"><?= $i++; ?></th>
-                                <td><?= esc($job['posisi']); ?></td>
-                                <td><?= esc($job['unit']); ?></td>
-                                <td><?= esc($job['kebutuhan']); ?></td>
+                                <!-- 
+                                PERBAIKAN: Menggunakan sintaks object ->
+                                -->
+                                <td><?= esc($job->posisi); ?></td>
+                                <td><?= esc($job->unit); ?></td>
+                                <td><?= esc($job->kebutuhan); ?></td>
                                 <td>
-                                    <?php if ($job['status'] == 'Dibuka') : ?>
+                                    <?php if ($job->status == 'Dibuka') : ?>
                                         <span class="badge bg-success">Dibuka</span>
                                     <?php else : ?>
-                                        <span class="badge bg-danger"><?= esc($job['status']); ?></span>
+                                        <span class="badge bg-danger"><?= esc($job->status); ?></span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <a href="<?= base_url('admin/lowongan/edit/' . $job['id']) ?>" class="btn btn-warning btn-sm" title="Edit">
+                                    <a href="<?= base_url('admin/lowongan/edit/' . $job->id) ?>" class="btn btn-warning btn-sm" title="Edit">
                                         <i class="fas fa-pen"></i> Edit
                                     </a>
-                                    <a href="<?= base_url('admin/lowongan/hapus/' . $job['id']) ?>" class="btn btn-danger btn-sm" title="Hapus" onclick="return confirm('Yakin ingin menghapus data lowongan: <?= esc($job['posisi']) ?>?')">
+                                    <a href="<?= base_url('admin/lowongan/hapus/' . $job->id) ?>" class="btn btn-danger btn-sm" title="Hapus" onclick="return confirm('Yakin ingin menghapus data lowongan: <?= esc($job->posisi) ?>?')">
                                         <i class="fas fa-trash"></i> Hapus
                                     </a>
                                 </td>

@@ -7,6 +7,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
@@ -87,7 +88,7 @@
                     </ul>
                 </li>
             <?php else : ?>
-                <li class="nav-item ms-2"><a class="btn-masuk-custom" href="<?= base_url('login') ?>">Masuk</a></li>
+                <li class="nav-item ms-2"><a class="btn btn-primary rounded-pill px-4" href="<?= base_url('login') ?>">Masuk</a></li>
             <?php endif; ?>
           </ul>
         </div>
@@ -113,20 +114,31 @@
                         <li>bws.sv@pu.go.id</li>
                     </ul>
                 </div>
+
                 <div class="col-lg-3">
                     <h6 class="fw-bold text-white text-uppercase mb-3" style="letter-spacing: 1px; font-size: 0.8rem;">Sosial Media</h6>
                     <div class="d-flex gap-2">
-                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;"><i class="fab fa-youtube"></i></a>
+                        <a href="https://x.com/bws_sumatera5" target="_blank" rel="noopener noreferrer" class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="X/Twitter">
+                            <i class="fab fa-x-twitter"></i>
+                        </a>
+                        <a href="https://www.facebook.com/balaiwilayahsungai.sumaterav" target="_blank" rel="noopener noreferrer" class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://www.instagram.com/pu_sda_sumatera5/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://www.youtube.com/@pupr_sda_bwssumatera5padang" target="_blank" rel="noopener noreferrer" class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
                     </div>
                 </div>
-            </div>
+                </div>
             <hr class="my-5 border-secondary opacity-25">
             <div class="text-center text-white-50 small">© <?= date('Y'); ?> Balai Wilayah Sungai Sumatera V. All rights reserved.</div>
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <?= $this->renderSection('scripts'); ?>
 </body>
 </html>
