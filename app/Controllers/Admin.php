@@ -25,18 +25,19 @@ class Admin extends BaseController
 
     public function index()
     {
-        // (Fungsi Dashboard Anda sudah ada di sini)
+        // (Fungsi Dashboard)
         $total_lowongan = $this->lowonganModel->countAllResults();
         $total_lamaran = $this->lamaranModel->countAllResults();
         $total_pending = $this->lamaranModel->where('status_lamaran', 'Pending')->countAllResults();
         $total_peserta = $this->userModel->where('role', 'mahasiswa')->countAllResults();
+        
         $pendaftar_terbaru = $this->lamaranModel
             ->select('tb_users.nama, tb_lowongan.posisi, tb_lamaran.tanggal_melamar')
             ->join('tb_users', 'tb_users.id = tb_lamaran.id_user')
             ->join('tb_lowongan', 'tb_lowongan.id = tb_lamaran.id_lowongan')
             ->orderBy('tb_lamaran.tanggal_melamar', 'DESC')
             ->limit(5)
-            ->findAll(); // Biarkan ini findAll, ini untuk widget dashboard
+            ->findAll();
         $data = [
             'title'    => 'Dashboard Admin',
             'total_lowongan' => $total_lowongan,
@@ -48,42 +49,72 @@ class Admin extends BaseController
         return view('admin/dashboard', $data);
     }
 
-    // --- (Fungsi CRUD Lowongan Anda TIDAK BERUBAH) ---
+    // --- (Fungsi CRUD Lowongan) ---
     public function lowongan()
     {
         $data = [
             'title'    => 'Kelola Lowongan Magang',
-            'lowongan' => $this->lowonganModel->orderBy('id', 'DESC')->findAll() // Tambah orderBy
+            'lowongan' => $this->lowonganModel->orderBy('id', 'DESC')->findAll()
         ];
         return view('admin/lowongan_index', $data);
     }
+    
     public function tambah()
     {
         $data = ['title' => 'Tambah Lowongan Baru'];
         return view('admin/lowongan_tambah', $data);
     }
+
+    /**
+     * ==========================================================
+     * [FUNGSI INI DIMODIFIKASI]
+     * Menambahkan Pengecekan Duplikasi Data
+     * ==========================================================
+     */
     public function simpan()
     {
-        // (Validasi bisa ditambahkan di sini)
+        $posisi = $this->request->getVar('posisi');
+        $unit   = $this->request->getVar('unit');
+
+        // 1. CEK DUPLIKASI
+        // Cari apakah ada data dengan Posisi DAN Unit yang sama persis
+        $cekDuplikat = $this->lowonganModel
+            ->where('posisi', $posisi)
+            ->where('unit', $unit)
+            ->first();
+
+        // 2. JIKA DITEMUKAN DUPLIKAT
+        if ($cekDuplikat) {
+            // Set pesan error flashdata
+            session()->setFlashdata('pesan_error', 'Gagal! Lowongan untuk posisi <b>' . $posisi . '</b> di unit <b>' . $unit . '</b> sudah terdaftar. Mohon cek kembali atau edit data yang ada.');
+            
+            // Kembalikan ke halaman sebelumnya + Bawa data inputan (withInput) agar tidak capek ngetik ulang
+            return redirect()->back()->withInput();
+        }
+
+        // 3. JIKA AMAN (TIDAK ADA DUPLIKAT), LANJUT SIMPAN
         $data = [
-            'posisi'    => $this->request->getVar('posisi'),
-            'unit'      => $this->request->getVar('unit'),
+            'posisi'    => $posisi,
+            'unit'      => $unit,
             'kebutuhan' => $this->request->getVar('kebutuhan'),
             'status'    => $this->request->getVar('status'),
             'deskripsi' => $this->request->getVar('deskripsi'),
         ];
         $this->lowonganModel->save($data);
+        
         session()->setFlashdata('pesan_sukses', 'Data lowongan baru berhasil ditambahkan!');
         return redirect()->to(base_url('admin/lowongan'));
     }
+
     public function edit($id)
     {
         $data = [
             'title'    => 'Edit Lowongan',
-            'lowongan' => $this->lowonganModel->find($id)
+            'lowongan' => $this->lowonganModel->find($id) 
         ];
         return view('admin/lowongan_edit', $data);
     }
+
     public function update()
     {
         $idLowongan = $this->request->getVar('id');
@@ -98,6 +129,7 @@ class Admin extends BaseController
         session()->setFlashdata('pesan_sukses', 'Data lowongan berhasil diperbarui!');
         return redirect()->to(base_url('admin/lowongan'));
     }
+
     public function hapus($id)
     {
         $this->lowonganModel->delete($id);
@@ -105,61 +137,24 @@ class Admin extends BaseController
         return redirect()->to(base_url('admin/lowongan'));
     }
 
-    // -------------------------------------------------------------------
-    // FITUR KELOLA PENDAFTAR (FUNGSI INI KITA MODIFIKASI TOTAL)
-    // -------------------------------------------------------------------
 
-    /**
-     * [FUNGSI INI DI-UPDATE]
-     * Menampilkan daftar semua pendaftar dengan search dan pagination
-     */
+    // -------------------------------------------------------------------
+    // FITUR KELOLA PENDAFTAR
+    // -------------------------------------------------------------------
     public function pendaftar()
     {
-        // 1. Ambil keyword pencarian dari URL (jika ada)
         $keyword = $this->request->getGet('keyword');
+        $query = $this->lamaranModel->searchPendaftar($keyword);
 
-        // 2. Siapkan query dasar (JOIN 3 tabel)
-        // Kita gunakan $this->lamaranModel yang dari construct
-        // Kita tambahkan ALIAS agar sesuai dengan view
-        $query = $this->lamaranModel
-            ->select('
-                tb_lamaran.id as id_lamaran, 
-                tb_lamaran.status_lamaran as status, 
-                tb_lamaran.tanggal_melamar as tgl_daftar, 
-                tb_users.nama as nama_pendaftar, 
-                tb_users.email, 
-                tb_lowongan.posisi
-            ')
-            ->join('tb_users', 'tb_users.id = tb_lamaran.id_user')
-            ->join('tb_lowongan', 'tb_lowongan.id = tb_lamaran.id_lowongan');
-
-        // 3. Jika ada keyword, tambahkan filter pencarian
-        if ($keyword) {
-            $query->groupStart() // Memulai grup ( ...
-                ->like('tb_users.nama', $keyword)
-                ->orLike('tb_users.email', $keyword)
-                ->orLike('tb_lowongan.posisi', $keyword)
-                ->orLike('tb_lamaran.status_lamaran', $keyword) // cari status juga
-                ->groupEnd(); // Menutup grup ... )
-        }
-
-        // 4. UBAH findAll() MENJADI paginate()
-        // 10 data per halaman, dengan nama grup 'pendaftar'
-        $daftarPendaftar = $query->orderBy('tb_lamaran.tanggal_melamar', 'DESC')
-                                 ->paginate(10, 'pendaftar');
-
-        // 5. Siapkan data untuk View
         $data = [
             'title'         => 'Data Pendaftar Magang',
-            'dataPendaftar' => $daftarPendaftar, // Ganti nama var
-            'pager'         => $this->lamaranModel->pager, // Tambahkan pager
+            'dataPendaftar' => $query->paginate(10, 'pendaftar'), 
+            'pager'         => $this->lamaranModel->pager, 
             'keyword'       => $keyword 
         ];
         
         return view('admin/pendaftar_index', $data);
     }
-
-    // --- (Fungsi-fungsi Anda yang lain TIDAK BERUBAH) ---
 
     public function updateStatus($id_lamaran, $status_baru)
     {
@@ -168,22 +163,37 @@ class Admin extends BaseController
             return redirect()->to(base_url('admin/pendaftar'));
         }
 
-        $lamaranData = $this->lamaranModel
-            ->select('tb_users.email, tb_users.nama, tb_lowongan.posisi')
-            ->join('tb_users', 'tb_users.id = tb_lamaran.id_user')
-            ->join('tb_lowongan', 'tb_lowongan.id = tb_lamaran.id_lowongan')
-            ->find($id_lamaran);
-
-        if (!$lamaranData) {
+        $lamaranIni = $this->lamaranModel->find($id_lamaran);
+        if (!$lamaranIni) {
             session()->setFlashdata('pesan_error', 'Data lamaran tidak ditemukan!');
             return redirect()->to(base_url('admin/pendaftar'));
         }
+        $id_user_peserta = $lamaranIni->id_user;
+
+        if ($status_baru == 'Diterima') {
+            $lamaranDiterimaLain = $this->lamaranModel
+                ->where('id_user', $id_user_peserta)
+                ->where('status_lamaran', 'Diterima')
+                ->where('id !=', $id_lamaran) 
+                ->first();
+
+            if ($lamaranDiterimaLain) {
+                session()->setFlashdata('pesan_error', 'GAGAL! Peserta ini sudah diterima di lowongan lain. Tolak lamaran yang lama jika ingin menerima yang ini.');
+                return redirect()->to(base_url('admin/pendaftar'));
+            }
+        }
 
         $this->lamaranModel->update($id_lamaran, ['status_lamaran' => $status_baru]);
-        
-        $emailTujuan = $lamaranData['email'];
-        $namaPendaftar = $lamaranData['nama'];
-        $posisiDilamar = $lamaranData['posisi'];
+
+        $dataEmail = $this->lamaranModel
+            ->select('tb_users.email, tb_users.nama, tb_lowongan.posisi')
+            ->join('tb_users', 'tb_users.id = tb_lamaran.id_user')
+            ->join('tb_lowongan', 'tb_lowongan.id = tb_lamaran.id_lowongan')
+            ->find($id_lamaran); 
+
+        $emailTujuan = $dataEmail->email;
+        $namaPendaftar = $dataEmail->nama;
+        $posisiDilamar = $dataEmail->posisi;
         
         $subject = ""; $message = "";
         if ($status_baru == 'Diterima') {
@@ -211,11 +221,14 @@ class Admin extends BaseController
             ->join('tb_users', 'tb_users.id = tb_lamaran.id_user')
             ->join('tb_lowongan', 'tb_lowongan.id = tb_lamaran.id_lowongan')
             ->find($id_lamaran); 
+
         if (!$dataLamaran) {
              session()->setFlashdata('pesan_error', 'Data lamaran tidak ditemukan!');
              return redirect()->to(base_url('admin/pendaftar'));
         }
-        $dataBiodata = $this->biodataModel->where('id_user', $dataLamaran['id_user'])->first();
+        
+        $dataBiodata = $this->biodataModel->where('id_user', $dataLamaran->id_user)->first();
+        
         $data = [ 'title'   => 'Detail Pendaftar', 'lamaran' => $dataLamaran, 'biodata' => $dataBiodata ];
         return view('admin/pendaftar_detail', $data);
     }
@@ -228,7 +241,7 @@ class Admin extends BaseController
     }
     
     // -------------------------------------------------------------------
-    // FITUR KELOLA ADMIN (TIDAK BERUBAH)
+    // FITUR KELOLA ADMIN
     // -------------------------------------------------------------------
     public function kelolaAdmin()
     {
@@ -272,7 +285,6 @@ class Admin extends BaseController
         return redirect()->to(base_url('admin/users'));
     }
     
-    // --- (Fungsi kirim email TIDAK BERUBAH) ---
     private function _kirimEmail($to, $subject, $message) {
         $email = \Config\Services::email();
         $email->setTo($to); $email->setSubject($subject); $email->setMessage($message);
@@ -284,7 +296,6 @@ class Admin extends BaseController
         if (!empty($urlTombol) && !empty($teksTombol)) {
             $tombolEmail = "<a href='" . $urlTombol . "' style='display: inline-block; background-color: #0d6efd; color: white; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 600; margin-top: 15px;'>" . $teksTombol . "</a>";
         }
-        // (Template email disingkat untuk keringkasan)
         return "<div style='font-family: Poppins, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>" 
                . "<h2 style='color: #0d6efd;'>" . $judul . "</h2>" 
                . "<p style='font-size: 16px; color: #333; line-height: 1.6;'>" . $paragraf1 . "</p>" 

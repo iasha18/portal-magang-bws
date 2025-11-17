@@ -10,6 +10,10 @@ class UserModel extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     
+    // Tentukan tipe data balikan (array/object)
+    // Biarkan 'array' agar sesuai dengan Controller Auth Anda
+    protected $returnType       = 'array'; 
+
     // Kolom-kolom yang boleh diisi atau diubah oleh aplikasi
     protected $allowedFields    = [
         'nama', 
@@ -17,10 +21,13 @@ class UserModel extends Model
         'password', 
         'role', 
         'created_at',
-        'reset_token', // <-- TAMBAHAN UNTUK FITUR LUPA PASSWORD
-        'reset_token_expires' // <-- TAMBAHAN UNTUK FITUR LUPA PASSWORD
+        'reset_token', // <-- Dibutuhkan untuk fitur Lupa Password
+        'reset_token_expires' // <-- Dibutuhkan untuk fitur Lupa Password
     ];
 
     // Fitur tambahan: Otomatis mencatat waktu saat data dibuat/diubah
+    // Anda menonaktifkannya (false), ini tidak masalah jika Anda mengaturnya manual.
     protected $useTimestamps = false; 
+    protected $createdField  = 'created_at';
+    protected $updatedField  = '';
 }
