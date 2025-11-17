@@ -32,13 +32,21 @@
             <p class="text-muted lead">Tahapan mudah untuk bergabung menjadi bagian dari kami</p>
         </div>
 
-        <div class="row row-cols-4 text-center mb-5 d-none d-lg-flex step-container">
-            <div class="step-line"></div>
-            <div class="col"><div class="step-icon">1</div></div>
-            <div class="col"><div class="step-icon">2</div></div>
-            <div class="col"><div class="step-icon">3</div></div>
-            <div class="col"><div class="step-icon">4</div></div>
+<div class="row row-cols-4 text-center mb-5 d-none d-lg-flex">
+    <!-- Wrapper baru dengan posisi relative -->
+    <div class="col-12 position-relative alur-magang-wrapper">
+        <!-- Garis horizontal (di belakang ikon) -->
+        <div class="alur-magang-line"></div>
+
+        <!-- Baris ikon sebenarnya: pakai d-flex agar mudah mengatur posisi -->
+        <div class="d-flex justify-content-between align-items-center mx-4">
+            <div class="alur-magang-col"><div class="alur-magang-icon">1</div></div>
+            <div class="alur-magang-col"><div class="alur-magang-icon">2</div></div>
+            <div class="alur-magang-col"><div class="alur-magang-icon">3</div></div>
+            <div class="alur-magang-col"><div class="alur-magang-icon">4</div></div>
         </div>
+    </div>
+</div>
 
         <div class="row g-4 justify-content-center">
             <div class="col-md-6 col-lg-3">
@@ -124,11 +132,11 @@
 <!-- 
 ===========================================================
 BAGIAN JAVASCRIPT:
-Tambahkan ini di section 'scripts' pada template Anda,
-atau letakkan saja di sini (sebelum endSection).
+Script dipindahkan ke dalam section 'scripts' agar
+lebih rapi dan dimuat setelah layout.
 ===========================================================
 -->
-<?php // $this->section('scripts') // Jika Anda punya section scripts, buka komentar ini ?>
+<?= $this->section('scripts') ?>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         
@@ -138,7 +146,6 @@ atau letakkan saja di sini (sebelum endSection).
             const container = document.getElementById('lowongan-container');
             
             // Cek apakah yang diklik adalah link di dalam .pagination
-            // Kita cari dari 'container' agar link baru (page 2, 3) juga berfungsi
             const targetLink = event.target.closest('.pagination a');
             
             if (targetLink) {
@@ -147,38 +154,61 @@ atau letakkan saja di sini (sebelum endSection).
                 
                 const url = targetLink.getAttribute('href');
                 
-                // Tampilkan loading sederhana
-                container.innerHTML = '<p class="text-center py-5">Memuat...</p>';
+                // [PERUBAHAN 1: KUNCI TINGGI]
+                // Kunci tinggi container untuk mencegah lompatan
+                const currentHeight = container.offsetHeight;
+                container.style.minHeight = currentHeight + 'px';
                 
-                // 2. Ambil data dari URL (misal: /home?page=2)
-                fetch(url, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest' // Penting: Menandai ini sebagai request AJAX
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) { throw new Error('Network response was not ok'); }
-                    return response.text();
-                })
-                .then(html => {
-                    // 3. Ganti isi container dengan HTML baru (dari _lowongan_list.php)
-                    container.innerHTML = html;
-                })
-                .catch(err => {
-                    console.error('Gagal fetch pagination:', err);
-                    container.innerHTML = '<p class="text-center text-danger py-5">Maaf, gagal memuat data.</p>';
-                });
+                // [PERUBAHAN 2: Mulai Fade-out]
+                // Tambahkan class .fading (opacity: 0)
+                container.classList.add('fading');
+                
+                // [PERUBAHAN 3: Tunggu animasi fade-out selesai]
+                // (Durasi 300ms ini HARUS SAMA dengan durasi di CSS)
+                setTimeout(() => {
+                    // Tampilkan "Memuat..."
+                    container.innerHTML = '<p class="text-center py-5">Memuat...</p>';
+
+                    // 2. Ambil data dari URL
+                    fetch(url, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) { throw new Error('Network response was not ok'); }
+                        return response.text();
+                    })
+                    .then(html => {
+                        // [PERUBAHAN 4: Ganti konten (masih dalam keadaan fade-out)]
+                        container.innerHTML = html;
+
+                        // [PERUBAHAN 5: Mulai Fade-in]
+                        // Hapus class .fading untuk mengembalikan opacity ke 1
+                        container.classList.remove('fading');
+
+                        // Lepaskan kunci tinggi setelah konten dimuat
+                        setTimeout(() => {
+                             container.style.minHeight = 'auto';
+                        }, 50); // Jeda singkat agar DOM update
+                    })
+                    .catch(err => {
+                        console.error('Gagal fetch pagination:', err);
+                        container.innerHTML = '<p class="text-center text-danger py-5">Maaf, gagal memuat data.</p>';
+                        // Pastikan class fading dihapus & tinggi dilepas jika error
+                        container.classList.remove('fading');
+                        container.style.minHeight = 'auto';
+                    });
+                }, 300); // <-- Durasi 300ms (0.3 detik)
             }
         }
         
         // Pasang event listener di #lowongan-container
-        // Ini penting agar link di halaman 2, 3, dst juga berfungsi
         const container = document.getElementById('lowongan-container');
         if (container) {
-            // Kita 'delegasikan' event click ke container
             container.addEventListener('click', handlePaginationClick);
         }
 
     });
 </script>
-<?php // $this->endSection() // Jika Anda punya section scripts, buka komentar ini ?>
+<?= $this->endSection() ?>  

@@ -247,7 +247,8 @@ class Admin extends BaseController
     {
         $data = [
             'title' => 'Kelola Pengguna Admin',
-            'admins' => $this->userModel->whereIn('role', ['admin', 'superadmin'])->findAll()
+            // Ambil semua kolom untuk admin, termasuk created_at dan ID.
+            'admins' => $this->userModel->select('id, nama, email, created_at, role')->whereIn('role', ['admin', 'superadmin'])->findAll()
         ];
         return view('admin/admin_index', $data);
     }
@@ -282,6 +283,93 @@ class Admin extends BaseController
         ];
         $this->userModel->save($data);
         session()->setFlashdata('pesan_sukses', 'Admin baru berhasil ditambahkan!');
+        return redirect()->to(base_url('admin/users'));
+    }
+    
+    /**
+     * Menampilkan form edit admin.
+     */
+    public function editAdmin($id)
+    {
+        $admin = $this->userModel->find($id);
+
+        if (!$admin || ($admin['role'] !== 'admin' && $admin['role'] !== 'superadmin')) {
+             session()->setFlashdata('pesan_error', 'Admin tidak ditemukan atau bukan pengguna Admin.');
+             return redirect()->to(base_url('admin/users'));
+        }
+
+        $data = [
+            'title' => 'Edit Pengguna Admin',
+            'admin' => $admin
+        ];
+        return view('admin/admin_edit', $data);
+    }
+
+    /**
+     * Memproses update data admin.
+     */
+    public function updateAdmin()
+    {
+        $id = $this->request->getVar('id');
+        $passwordBaru = $this->request->getVar('password');
+        $emailBaru = $this->request->getVar('email');
+        
+        $adminLama = $this->userModel->find($id);
+
+        // Aturan validasi
+        $aturan = [
+            'nama' => ['rules' => 'required', 'errors' => ['required' => 'Nama lengkap wajib diisi.']],
+            'email' => [
+                // Cek unik email, kecuali email yang sedang diedit
+                'rules' => "required|valid_email|is_unique[tb_users.email,id,{$id}]", 
+                'errors' => ['required' => 'Email wajib diisi.', 'valid_email' => 'Format email tidak valid.', 'is_unique' => 'Email ini sudah terdaftar.']
+            ],
+            // Jika password diisi, validasi konfirmasi
+            'confpassword' => ['rules' => 'matches[password]', 'errors' => ['matches' => 'Konfirmasi password tidak sama.']]
+        ];
+
+        // Jika password diisi, tambahkan aturan minimal panjang
+        if (!empty($passwordBaru)) {
+            $aturan['password'] = ['rules' => 'required|min_length[6]', 'errors' => ['required' => 'Password wajib diisi.', 'min_length' => 'Password minimal 6 karakter.']];
+        }
+
+        if (!$this->validate($aturan)) {
+            // Jika validasi gagal, kembali ke form edit dengan error
+            return redirect()->to(base_url('admin/users/edit/' . $id))->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        $data = [
+            'nama'  => $this->request->getVar('nama'),
+            'email' => $emailBaru,
+            'role'  => $this->request->getVar('role') // Memungkinkan superadmin mengubah role
+        ];
+
+        // Hanya update password jika diisi
+        if (!empty($passwordBaru)) {
+            $data['password'] = password_hash($passwordBaru, PASSWORD_DEFAULT);
+        }
+
+        $this->userModel->update($id, $data);
+        
+        session()->setFlashdata('pesan_sukses', 'Data Admin berhasil diperbarui!');
+        return redirect()->to(base_url('admin/users'));
+    }
+
+    /**
+     * Menghapus admin
+     */
+    public function hapusAdmin($id)
+    {
+        $admin = $this->userModel->find($id);
+
+        // Batasi penghapusan Super Admin pertama (ID 1)
+        if ($id == 1 && $admin['role'] == 'superadmin') {
+             session()->setFlashdata('pesan_error', 'Pengguna Super Admin utama tidak dapat dihapus!');
+             return redirect()->to(base_url('admin/users'));
+        }
+
+        $this->userModel->delete($id);
+        session()->setFlashdata('pesan_sukses', 'Pengguna Admin berhasil dihapus.');
         return redirect()->to(base_url('admin/users'));
     }
     

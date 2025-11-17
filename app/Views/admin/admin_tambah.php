@@ -20,6 +20,7 @@
             </div>
         <?php endif; ?>
 
+        <!-- Formulir ini mengirim data ke 'admin/users/simpan' -->
         <form action="<?= base_url('admin/users/simpan') ?>" method="post">
             <?= csrf_field() ?>
             
@@ -46,12 +47,19 @@
                 </div>
             </div>
 
-            <div class="d-flex gap-2 mt-4">
-                <button type="submit" class="btn btn-primary rounded-pill fw-bold px-4" style="background-color: var(--nude-primary); border: none;">
-                    <i class="fas fa-save me-2"></i>Simpan Admin
-                </button>
-                <a href="<?= base_url('admin/users') ?>" class="btn btn-outline-secondary rounded-pill px-4">Batal</a>
-            </div>
+<div class="d-flex gap-2 mt-4">
+    <button type="submit" 
+        class="btn rounded-pill fw-bold px-4 text-white"
+        style="background-color:#0000FF; border: none;">
+        <i class="fas fa-save me-2"></i>Simpan Admin
+    </button>
+
+ <a href="<?= base_url('admin/users') ?>" 
+       class="btn btn-danger rounded-pill px-4 text-white">
+       Batal
+    </a>
+</div>
+
 
         </form>
 

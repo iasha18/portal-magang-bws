@@ -1,3 +1,9 @@
+<?php
+// app/Views/layout/template.php
+
+// Pastikan helper URL dimuat untuk fungsi base_url()
+helper('url');
+?>
 <!doctype html>
 <html lang="id">
 <head>
@@ -26,22 +32,25 @@
         .hero-overlay { position: relative; z-index: 2; background-color: rgba(17, 24, 39, 0.65); padding-top: 160px; padding-bottom: 160px; }
 
         /* --- CSS ALUR MAGANG (PRESISI TINGGI) --- */
-        .step-container {
+        /* Menggantikan .step-container */
+        .alur-magang-container {
             position: relative;
-            padding: 20px 0; /* PENTING: Jangan ada padding kiri/kanan di sini agar kalkulasi akurat */
+            padding: 20px 0;
         }
-        .step-icon {
+        /* Menggantikan .step-icon */
+        .alur-magang-icon {
             width: 60px; height: 60px;
-            background-color: var(--bs-primary); /* Lingkaran BIRU */
+            background-color: var(--bs-primary);
             color: white; font-size: 1.5rem; font-weight: 700;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px; /* Posisi tengah horizontal */
-            position: relative; z-index: 2; /* Wajib di atas garis */
-            border: 5px solid #fff; /* Border putih pemotong garis */
-            box-shadow: 0 0 0 5px rgba(var(--bs-primary-rgb), 0.2); /* Efek halo biru transparan */
+            margin: 0 auto 20px;
+            position: relative; z-index: 2;
+            border: 5px solid #fff;
+            box-shadow: 0 0 0 5px rgba(var(--bs-primary-rgb), 0.2);
         }
 
-.step-line {
+/* Menggantikan .step-line dan memperbaiki kalkulasi */
+.alur-magang-line {
     position: absolute;
     height: 4px;
     background-color: var(--bs-primary);
@@ -49,16 +58,89 @@
     z-index: 1;
     border-radius: 10px;
     top: 50px;
-    left: calc(10% + 30px);
-    right: calc(10% + 30px);
+    /* Mulai di tepi kanan ikon 1: 12.5% + 30px */
+    left: calc(12.5% + 30px);
+    /* [DIKOREKSI] Akhir garis: Berhenti tepat 30px setelah pusat ikon 3.
+       Pusat ikon 3 berada 62.5% dari kiri. Jarak dari kanan harus 37.5% - 30px.
+       Ini akan memanjangkan garis melewati nilai yang salah sebelumnya.
+       
+       *Catatan*: Jika Anda ingin garis berhenti di tengah-tengah antara 3 dan 4, 
+       coba gunakan `right: 25%`. Jika ingin berhenti di tepi ikon 3, gunakan nilai ini:
+    */
+    right: calc(37.5% - 30px); 
     transform: translateY(-50%);
 }
 
 
-        
+    
+        /* --- ALUR MAGANG (robust) --- */
+.alur-magang-wrapper {
+    position: relative;
+    padding: 24px 0;
+    min-height: 100px; /* memberi ruang untuk ikon dan garis */
+}
+
+/* Garis horizontal yang membentang di belakang ikon */
+.alur-magang-line {
+    position: absolute;
+    top: 50%;
+    left: 4%;
+    right: 4%;
+    height: 6px;
+    background-color: var(--bs-primary);
+    opacity: 0.18;
+    border-radius: 6px;
+    transform: translateY(-50%);
+    z-index: 1; /* di bawah ikon */
+}
+
+/* Ikon (tetap seperti sebelumya, tapi z-index lebih tinggi sehingga menutupi garis) */
+.alur-magang-icon {
+    width: 60px;
+    height: 60px;
+    background-color: var(--bs-primary);
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2; /* di atas garis */
+    border: 5px solid #fff;
+    box-shadow: 0 0 0 5px rgba(var(--bs-primary-rgb), 0.18);
+}
+
+/* Kolom pembungkus ikon agar distribusi benar di d-flex */
+.alur-magang-col {
+    flex: 0 0 calc(25% - 1rem); /* sediakan 4 kolom seimbang */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
         /* --- KARTU ALUR --- */
         .card-alu { border: none; transition: 0.3s; border-radius: 15px; background: #fff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .card-alu:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+
+        /* ===========================================================
+        [CSS BARU] Tambahkan ini untuk transisi fade
+        ===========================================================
+        */
+        #lowongan-container {
+            /* Menentukan properti yang akan dianimasikan */
+            transition: opacity 0.3s ease-in-out;
+            opacity: 1; /* Status normal (terlihat) */
+        }
+
+        #lowongan-container.fading {
+            opacity: 0; /* Status fade-out (menghilang) */
+        }
+
+/* Responsive tweak: pada layar besar wrapper akan terlihat, di bawah lg Anda sudah punya versi kartu */
+/* Jika butuh, sesuaikan left/right pada .alur-magang-line untuk melebarkan/mempersempit garis */
+
     </style>
 </head>
 <body>
