@@ -53,5 +53,9 @@ $routes->group('admin', ['filter' => ['auth', 'admin']], function($routes) {
         $routes->get('/', 'Admin::kelolaAdmin');
         $routes->get('tambah', 'Admin::tambahAdmin');
         $routes->post('simpan', 'Admin::simpanAdmin');
+        // Rute CRUD Admin yang baru diimplementasikan
+        $routes->get('edit/(:num)', 'Admin::editAdmin/$1');
+        $routes->post('update', 'Admin::updateAdmin');
+        $routes->get('hapus/(:num)', 'Admin::hapusAdmin/$1');
     });
 });

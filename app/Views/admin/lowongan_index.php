@@ -43,18 +43,22 @@
                         <?php foreach ($lowongan as $job) : ?>
                             <tr>
                                 <th scope="row"><?= $i++; ?></th>
-                                <!-- 
-                                PERBAIKAN: Menggunakan sintaks object ->
-                                -->
                                 <td><?= esc($job->posisi); ?></td>
                                 <td><?= esc($job->unit); ?></td>
                                 <td><?= esc($job->kebutuhan); ?></td>
                                 <td>
-                                    <?php if ($job->status == 'Dibuka') : ?>
-                                        <span class="badge bg-success">Dibuka</span>
-                                    <?php else : ?>
-                                        <span class="badge bg-danger"><?= esc($job->status); ?></span>
-                                    <?php endif; ?>
+                                    <?php
+                                        // PERBAIKAN: Menggunakan strtolower() untuk membuat perbandingan case-insensitive
+                                        $status = strtolower($job->status);
+                                        $badge_color = 'bg-danger'; // Default untuk 'Tutup'
+
+                                        if ($status == 'dibuka') {
+                                            $badge_color = 'bg-success';
+                                        } elseif ($status == 'penuh') {
+                                            $badge_color = 'bg-warning text-dark';
+                                        }
+                                    ?>
+                                    <span class="badge <?= $badge_color; ?>"><?= esc($job->status); ?></span>
                                 </td>
                                 <td>
                                     <a href="<?= base_url('admin/lowongan/edit/' . $job->id) ?>" class="btn btn-warning btn-sm" title="Edit">
